@@ -113,6 +113,101 @@ class TableTodo extends SqfEntityTableBase {
     return _instance = _instance ?? TableTodo();
   }
 }
+
+// ParkedBill TABLE
+class TableParkedBill extends SqfEntityTableBase {
+  TableParkedBill() {
+    // declare properties of EntityTable
+    tableName = 'parkedBills';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = false;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldBase('billId', DbType.text, isUnique: true),
+      SqfEntityFieldBase('name', DbType.text, isUnique: true),
+      SqfEntityFieldBase('subtotal', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('tax', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('discount', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('netAmount', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('dateCreated', DbType.datetime,
+          defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableParkedBill();
+  }
+}
+
+// ParkedBillItem TABLE
+class TableParkedBillItem extends SqfEntityTableBase {
+  TableParkedBillItem() {
+    // declare properties of EntityTable
+    tableName = 'parkedBillItems';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = false;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldRelationshipBase(
+          TableParkedBill.getInstance, DeleteRule.CASCADE,
+          relationType: RelationType.ONE_TO_MANY, fieldName: 'pLocalBillId'),
+      SqfEntityFieldBase('itemId', DbType.text, isUnique: true),
+      SqfEntityFieldBase('pBillId', DbType.text),
+      SqfEntityFieldBase('image', DbType.text),
+      SqfEntityFieldBase('quantity', DbType.numeric),
+      SqfEntityFieldBase('subtotal', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('tax', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('discount', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('netAmount', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('dateCreated', DbType.datetime,
+          defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableParkedBillItem();
+  }
+}
+
+// ParkedBillItemTax TABLE
+class TableParkedBillItemTax extends SqfEntityTableBase {
+  TableParkedBillItemTax() {
+    // declare properties of EntityTable
+    tableName = 'parkedBillItemTaxes';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = false;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldRelationshipBase(
+          TableParkedBillItem.getInstance, DeleteRule.CASCADE,
+          relationType: RelationType.ONE_TO_MANY, fieldName: 'pLocalItemId'),
+      SqfEntityFieldBase('taxId', DbType.text, isUnique: true),
+      SqfEntityFieldBase('pItemId', DbType.text),
+      SqfEntityFieldBase('name', DbType.text),
+      SqfEntityFieldBase('taxMethod', DbType.text),
+      SqfEntityFieldBase('rate', DbType.numeric),
+      SqfEntityFieldBase('tax', DbType.numeric),
+      SqfEntityFieldBase('dateCreated', DbType.datetime,
+          defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableParkedBillItemTax();
+  }
+}
 // END TABLES
 
 // BEGIN SEQUENCES
@@ -147,6 +242,9 @@ class MyDbModel extends SqfEntityModelProvider {
       TableProduct.getInstance,
       TableCategory.getInstance,
       TableTodo.getInstance,
+      TableParkedBill.getInstance,
+      TableParkedBillItem.getInstance,
+      TableParkedBillItemTax.getInstance,
     ];
 
     sequences = [
@@ -3335,6 +3433,3314 @@ class TodoManager extends SqfEntityProvider {
 }
 
 //endregion TodoManager
+// region ParkedBill
+class ParkedBill extends TableBase {
+  ParkedBill(
+      {this.id,
+      this.billId,
+      this.name,
+      this.subtotal,
+      this.tax,
+      this.discount,
+      this.netAmount,
+      this.dateCreated}) {
+    _setDefaultValues();
+    softDeleteActivated = false;
+  }
+  ParkedBill.withFields(this.billId, this.name, this.subtotal, this.tax,
+      this.discount, this.netAmount, this.dateCreated) {
+    _setDefaultValues();
+  }
+  ParkedBill.withId(this.id, this.billId, this.name, this.subtotal, this.tax,
+      this.discount, this.netAmount, this.dateCreated) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  ParkedBill.fromMap(Map<String, dynamic> o, {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    if (o['billId'] != null) {
+      billId = o['billId'].toString();
+    }
+    if (o['name'] != null) {
+      name = o['name'].toString();
+    }
+    if (o['subtotal'] != null) {
+      subtotal = int.tryParse(o['subtotal'].toString());
+    }
+    if (o['tax'] != null) {
+      tax = int.tryParse(o['tax'].toString());
+    }
+    if (o['discount'] != null) {
+      discount = int.tryParse(o['discount'].toString());
+    }
+    if (o['netAmount'] != null) {
+      netAmount = int.tryParse(o['netAmount'].toString());
+    }
+    if (o['dateCreated'] != null) {
+      dateCreated = int.tryParse(o['dateCreated'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['dateCreated'].toString())!)
+          : DateTime.tryParse(o['dateCreated'].toString());
+    }
+  }
+  // FIELDS (ParkedBill)
+  int? id;
+  String? billId;
+  String? name;
+  int? subtotal;
+  int? tax;
+  int? discount;
+  int? netAmount;
+  DateTime? dateCreated;
+
+  // end FIELDS (ParkedBill)
+
+  // COLLECTIONS & VIRTUALS (ParkedBill)
+  /// to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plParkedBillItems', 'plField2'..]) or so on..
+  List<ParkedBillItem>? plParkedBillItems;
+
+  /// get ParkedBillItem(s) filtered by id=pLocalBillId
+  ParkedBillItemFilterBuilder? getParkedBillItems(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    if (id == null) {
+      return null;
+    }
+    return ParkedBillItem()
+        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
+        .pLocalBillId
+        .equals(id)
+        .and;
+  }
+
+  // END COLLECTIONS & VIRTUALS (ParkedBill)
+
+  static const bool _softDeleteActivated = false;
+  ParkedBillManager? __mnParkedBill;
+
+  ParkedBillManager get _mnParkedBill {
+    return __mnParkedBill = __mnParkedBill ?? ParkedBillManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (billId != null || !forView) {
+      map['billId'] = billId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (subtotal != null || !forView) {
+      map['subtotal'] = subtotal;
+    }
+    if (tax != null || !forView) {
+      map['tax'] = tax;
+    }
+    if (discount != null || !forView) {
+      map['discount'] = discount;
+    }
+    if (netAmount != null || !forView) {
+      map['netAmount'] = netAmount;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (billId != null || !forView) {
+      map['billId'] = billId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (subtotal != null || !forView) {
+      map['subtotal'] = subtotal;
+    }
+    if (tax != null || !forView) {
+      map['tax'] = tax;
+    }
+    if (discount != null || !forView) {
+      map['discount'] = discount;
+    }
+    if (netAmount != null || !forView) {
+      map['netAmount'] = netAmount;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+  // COLLECTIONS (ParkedBill)
+    if (!forQuery) {
+      map['ParkedBillItems'] = await getParkedBillItems()!.toMapList();
+    }
+  // END COLLECTIONS (ParkedBill)
+
+    return map;
+  }
+
+  /// This method returns Json String [ParkedBill]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [ParkedBill]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [
+      billId,
+      name,
+      subtotal,
+      tax,
+      discount,
+      netAmount,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [
+      id,
+      billId,
+      name,
+      subtotal,
+      tax,
+      discount,
+      netAmount,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  static Future<List<ParkedBill>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ParkedBill.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<ParkedBill>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <ParkedBill>[];
+    try {
+      objList = list
+          .map((parkedbill) =>
+              ParkedBill.fromMap(parkedbill as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ParkedBill.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<ParkedBill>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<ParkedBill> objList = <ParkedBill>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = ParkedBill.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+      // final List<String> _loadedFields = List<String>.from(loadedFields);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('parkedBills.plParkedBillItems') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plParkedBillItems'))) {
+          /*_loadedfields!.add('parkedBills.plParkedBillItems'); */ obj
+                  .plParkedBillItems =
+              obj.plParkedBillItems ??
+                  await obj.getParkedBillItems()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns ParkedBill by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [ParkedBill] if exist, otherwise returns null
+  Future<ParkedBill?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    ParkedBill? obj;
+    final data = await _mnParkedBill.getById([id]);
+    if (data.length != 0) {
+      obj = ParkedBill.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('parkedBills.plParkedBillItems') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plParkedBillItems'))) {
+          /*_loadedfields!.add('parkedBills.plParkedBillItems'); */ obj
+                  .plParkedBillItems =
+              obj.plParkedBillItems ??
+                  await obj.getParkedBillItems()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (ParkedBill) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnParkedBill.insert(this, ignoreBatch);
+    } else {
+      await _mnParkedBill.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (ParkedBill) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnParkedBill.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnParkedBill.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs ParkedBill. Returns a new Primary Key value of ParkedBill
+
+  /// <returns>Returns a new Primary Key value of ParkedBill
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<ParkedBill> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(List<ParkedBill> parkedbills,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await MyDbModel().batchStart();
+    for (final obj in parkedbills) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await MyDbModel().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < parkedbills.length; i++) {
+        if (parkedbills[i].id == null) {
+          parkedbills[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnParkedBill.rawInsert(
+          'INSERT OR REPLACE INTO parkedBills (id, billId, name, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?)',
+          [
+            id,
+            billId,
+            name,
+            subtotal,
+            tax,
+            discount,
+            netAmount,
+            dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+          ],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'ParkedBill id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false, errorMessage: 'ParkedBill id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage: 'ParkedBill Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<ParkedBill>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(List<ParkedBill> parkedbills,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    final results = await _mnParkedBill.rawInsertAll(
+        'INSERT OR REPLACE INTO parkedBills (id, billId, name, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?)',
+        parkedbills,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes ParkedBill
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete ParkedBill invoked (id=$id)');
+    var result = BoolResult(success: false);
+    {
+      result = await ParkedBillItem()
+          .select()
+          .pLocalBillId
+          .equals(id)
+          .and
+          .delete(hardDelete);
+    }
+    if (!result.success) {
+      return result;
+    }
+    if (!_softDeleteActivated || hardDelete) {
+      return _mnParkedBill
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnParkedBill.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) {
+    // not implemented because:
+    final msg =
+        'set useSoftDeleting:true in the table definition of [ParkedBill] to use this feature';
+    throw UnimplementedError(msg);
+  }
+
+  @override
+  ParkedBillFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ParkedBillFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  ParkedBillFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ParkedBillFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    subtotal = subtotal ?? 0;
+    tax = tax ?? 0;
+    discount = discount ?? 0;
+    netAmount = netAmount ?? 0;
+    dateCreated = dateCreated ?? DateTime.now();
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion parkedbill
+
+// region ParkedBillField
+class ParkedBillField extends FilterBase {
+  ParkedBillField(ParkedBillFilterBuilder parkedbillFB) : super(parkedbillFB);
+
+  @override
+  ParkedBillFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder isNull() {
+    return super.isNull() as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as ParkedBillFilterBuilder;
+  }
+
+  @override
+  ParkedBillField get not {
+    return super.not as ParkedBillField;
+  }
+}
+// endregion ParkedBillField
+
+// region ParkedBillFilterBuilder
+class ParkedBillFilterBuilder extends ConjunctionBase {
+  ParkedBillFilterBuilder(ParkedBill obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnParkedBill = obj._mnParkedBill;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  ParkedBillManager? _mnParkedBill;
+
+  /// put the sql keyword 'AND'
+  @override
+  ParkedBillFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  ParkedBillFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  ParkedBillFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  ParkedBillFilterBuilder where(String? whereCriteria,
+      {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  ParkedBillFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  ParkedBillFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  ParkedBillFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ParkedBillFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ParkedBillFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ParkedBillFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ParkedBillFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  ParkedBillField _setField(
+      ParkedBillField? field, String colName, DbType dbtype) {
+    return ParkedBillField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  ParkedBillField? _id;
+  ParkedBillField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  ParkedBillField? _billId;
+  ParkedBillField get billId {
+    return _billId = _setField(_billId, 'billId', DbType.text);
+  }
+
+  ParkedBillField? _name;
+  ParkedBillField get name {
+    return _name = _setField(_name, 'name', DbType.text);
+  }
+
+  ParkedBillField? _subtotal;
+  ParkedBillField get subtotal {
+    return _subtotal = _setField(_subtotal, 'subtotal', DbType.numeric);
+  }
+
+  ParkedBillField? _tax;
+  ParkedBillField get tax {
+    return _tax = _setField(_tax, 'tax', DbType.numeric);
+  }
+
+  ParkedBillField? _discount;
+  ParkedBillField get discount {
+    return _discount = _setField(_discount, 'discount', DbType.numeric);
+  }
+
+  ParkedBillField? _netAmount;
+  ParkedBillField get netAmount {
+    return _netAmount = _setField(_netAmount, 'netAmount', DbType.numeric);
+  }
+
+  ParkedBillField? _dateCreated;
+  ParkedBillField get dateCreated {
+    return _dateCreated =
+        _setField(_dateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  /// Deletes List<ParkedBill> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+    // Delete sub records where in (ParkedBillItem) according to DeleteRule.CASCADE
+    final idListParkedBillItemBYpLocalBillId = toListPrimaryKeySQL(false);
+    final resParkedBillItemBYpLocalBillId = await ParkedBillItem()
+        .select()
+        .where('pLocalBillId IN (${idListParkedBillItemBYpLocalBillId['sql']})',
+            parameterValue: idListParkedBillItemBYpLocalBillId['args'])
+        .delete(hardDelete);
+    if (!resParkedBillItemBYpLocalBillId.success) {
+      return resParkedBillItemBYpLocalBillId;
+    }
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnParkedBill!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnParkedBill!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from parkedBills ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnParkedBill!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [ParkedBill] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ParkedBill?
+  @override
+  Future<ParkedBill?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnParkedBill!.toList(qparams);
+    final data = await objFuture;
+    ParkedBill? obj;
+    if (data.isNotEmpty) {
+      obj = ParkedBill.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('parkedBills.plParkedBillItems') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plParkedBillItems'))) {
+          /*_loadedfields!.add('parkedBills.plParkedBillItems'); */ obj
+                  .plParkedBillItems =
+              obj.plParkedBillItems ??
+                  await obj.getParkedBillItems()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [ParkedBill]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ParkedBill?
+  @override
+  Future<ParkedBill> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        ParkedBill();
+  }
+
+  /// This method returns int. [ParkedBill]
+  /// <returns>int
+  @override
+  Future<int> toCount([VoidCallback Function(int c)? parkedbillCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final parkedbillsFuture = await _mnParkedBill!.toList(qparams);
+    final int count = parkedbillsFuture[0]['CNT'] as int;
+    if (parkedbillCount != null) {
+      parkedbillCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<ParkedBill> [ParkedBill]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<ParkedBill>
+  @override
+  Future<List<ParkedBill>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<ParkedBill> parkedbillsData = await ParkedBill.fromMapList(data,
+        preload: preload,
+        preloadFields: preloadFields,
+        loadParents: loadParents,
+        loadedFields: loadedFields,
+        setDefaultValues: qparams.selectColumns == null);
+    return parkedbillsData;
+  }
+
+  /// This method returns Json String [ParkedBill]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [ParkedBill]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [ParkedBill]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnParkedBill!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [ParkedBill]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] =
+        'SELECT `id` FROM parkedBills WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnParkedBill!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [ParkedBill]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnParkedBill!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await ParkedBill.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnParkedBill!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion ParkedBillFilterBuilder
+
+// region ParkedBillFields
+class ParkedBillFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fBillId;
+  static TableField get billId {
+    return _fBillId =
+        _fBillId ?? SqlSyntax.setField(_fBillId, 'billId', DbType.text);
+  }
+
+  static TableField? _fName;
+  static TableField get name {
+    return _fName = _fName ?? SqlSyntax.setField(_fName, 'name', DbType.text);
+  }
+
+  static TableField? _fSubtotal;
+  static TableField get subtotal {
+    return _fSubtotal = _fSubtotal ??
+        SqlSyntax.setField(_fSubtotal, 'subtotal', DbType.numeric);
+  }
+
+  static TableField? _fTax;
+  static TableField get tax {
+    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.numeric);
+  }
+
+  static TableField? _fDiscount;
+  static TableField get discount {
+    return _fDiscount = _fDiscount ??
+        SqlSyntax.setField(_fDiscount, 'discount', DbType.numeric);
+  }
+
+  static TableField? _fNetAmount;
+  static TableField get netAmount {
+    return _fNetAmount = _fNetAmount ??
+        SqlSyntax.setField(_fNetAmount, 'netAmount', DbType.numeric);
+  }
+
+  static TableField? _fDateCreated;
+  static TableField get dateCreated {
+    return _fDateCreated = _fDateCreated ??
+        SqlSyntax.setField(_fDateCreated, 'dateCreated', DbType.datetime);
+  }
+}
+// endregion ParkedBillFields
+
+//region ParkedBillManager
+class ParkedBillManager extends SqfEntityProvider {
+  ParkedBillManager()
+      : super(MyDbModel(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'parkedBills';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion ParkedBillManager
+// region ParkedBillItem
+class ParkedBillItem extends TableBase {
+  ParkedBillItem(
+      {this.id,
+      this.pLocalBillId,
+      this.itemId,
+      this.pBillId,
+      this.image,
+      this.quantity,
+      this.subtotal,
+      this.tax,
+      this.discount,
+      this.netAmount,
+      this.dateCreated}) {
+    _setDefaultValues();
+    softDeleteActivated = false;
+  }
+  ParkedBillItem.withFields(
+      this.pLocalBillId,
+      this.itemId,
+      this.pBillId,
+      this.image,
+      this.quantity,
+      this.subtotal,
+      this.tax,
+      this.discount,
+      this.netAmount,
+      this.dateCreated) {
+    _setDefaultValues();
+  }
+  ParkedBillItem.withId(
+      this.id,
+      this.pLocalBillId,
+      this.itemId,
+      this.pBillId,
+      this.image,
+      this.quantity,
+      this.subtotal,
+      this.tax,
+      this.discount,
+      this.netAmount,
+      this.dateCreated) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  ParkedBillItem.fromMap(Map<String, dynamic> o,
+      {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    pLocalBillId = int.tryParse(o['pLocalBillId'].toString());
+
+    if (o['itemId'] != null) {
+      itemId = o['itemId'].toString();
+    }
+    if (o['pBillId'] != null) {
+      pBillId = o['pBillId'].toString();
+    }
+    if (o['image'] != null) {
+      image = o['image'].toString();
+    }
+    if (o['quantity'] != null) {
+      quantity = int.tryParse(o['quantity'].toString());
+    }
+    if (o['subtotal'] != null) {
+      subtotal = int.tryParse(o['subtotal'].toString());
+    }
+    if (o['tax'] != null) {
+      tax = int.tryParse(o['tax'].toString());
+    }
+    if (o['discount'] != null) {
+      discount = int.tryParse(o['discount'].toString());
+    }
+    if (o['netAmount'] != null) {
+      netAmount = int.tryParse(o['netAmount'].toString());
+    }
+    if (o['dateCreated'] != null) {
+      dateCreated = int.tryParse(o['dateCreated'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['dateCreated'].toString())!)
+          : DateTime.tryParse(o['dateCreated'].toString());
+    }
+
+    // RELATIONSHIPS FromMAP
+    plParkedBill = o['parkedBill'] != null
+        ? ParkedBill.fromMap(o['parkedBill'] as Map<String, dynamic>)
+        : null;
+    // END RELATIONSHIPS FromMAP
+  }
+  // FIELDS (ParkedBillItem)
+  int? id;
+  int? pLocalBillId;
+  String? itemId;
+  String? pBillId;
+  String? image;
+  int? quantity;
+  int? subtotal;
+  int? tax;
+  int? discount;
+  int? netAmount;
+  DateTime? dateCreated;
+
+  // end FIELDS (ParkedBillItem)
+
+// RELATIONSHIPS (ParkedBillItem)
+  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plParkedBill', 'plField2'..]) or so on..
+  ParkedBill? plParkedBill;
+
+  /// get ParkedBill By PLocalBillId
+  Future<ParkedBill?> getParkedBill(
+      {bool loadParents = false, List<String>? loadedFields}) async {
+    final _obj = await ParkedBill().getById(pLocalBillId,
+        loadParents: loadParents, loadedFields: loadedFields);
+    return _obj;
+  }
+  // END RELATIONSHIPS (ParkedBillItem)
+
+// COLLECTIONS & VIRTUALS (ParkedBillItem)
+  /// to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plParkedBillItemTaxs', 'plField2'..]) or so on..
+  List<ParkedBillItemTax>? plParkedBillItemTaxs;
+
+  /// get ParkedBillItemTax(s) filtered by id=pLocalItemId
+  ParkedBillItemTaxFilterBuilder? getParkedBillItemTaxs(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    if (id == null) {
+      return null;
+    }
+    return ParkedBillItemTax()
+        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
+        .pLocalItemId
+        .equals(id)
+        .and;
+  }
+
+// END COLLECTIONS & VIRTUALS (ParkedBillItem)
+
+  static const bool _softDeleteActivated = false;
+  ParkedBillItemManager? __mnParkedBillItem;
+
+  ParkedBillItemManager get _mnParkedBillItem {
+    return __mnParkedBillItem = __mnParkedBillItem ?? ParkedBillItemManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (pLocalBillId != null) {
+      map['pLocalBillId'] = forView
+          ? plParkedBill == null
+              ? pLocalBillId
+              : plParkedBill!.billId
+          : pLocalBillId;
+    } else if (pLocalBillId != null || !forView) {
+      map['pLocalBillId'] = null;
+    }
+    if (itemId != null || !forView) {
+      map['itemId'] = itemId;
+    }
+    if (pBillId != null || !forView) {
+      map['pBillId'] = pBillId;
+    }
+    if (image != null || !forView) {
+      map['image'] = image;
+    }
+    if (quantity != null || !forView) {
+      map['quantity'] = quantity;
+    }
+    if (subtotal != null || !forView) {
+      map['subtotal'] = subtotal;
+    }
+    if (tax != null || !forView) {
+      map['tax'] = tax;
+    }
+    if (discount != null || !forView) {
+      map['discount'] = discount;
+    }
+    if (netAmount != null || !forView) {
+      map['netAmount'] = netAmount;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (pLocalBillId != null) {
+      map['pLocalBillId'] = forView
+          ? plParkedBill == null
+              ? pLocalBillId
+              : plParkedBill!.billId
+          : pLocalBillId;
+    } else if (pLocalBillId != null || !forView) {
+      map['pLocalBillId'] = null;
+    }
+    if (itemId != null || !forView) {
+      map['itemId'] = itemId;
+    }
+    if (pBillId != null || !forView) {
+      map['pBillId'] = pBillId;
+    }
+    if (image != null || !forView) {
+      map['image'] = image;
+    }
+    if (quantity != null || !forView) {
+      map['quantity'] = quantity;
+    }
+    if (subtotal != null || !forView) {
+      map['subtotal'] = subtotal;
+    }
+    if (tax != null || !forView) {
+      map['tax'] = tax;
+    }
+    if (discount != null || !forView) {
+      map['discount'] = discount;
+    }
+    if (netAmount != null || !forView) {
+      map['netAmount'] = netAmount;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+// COLLECTIONS (ParkedBillItem)
+    if (!forQuery) {
+      map['ParkedBillItemTaxs'] = await getParkedBillItemTaxs()!.toMapList();
+    }
+// END COLLECTIONS (ParkedBillItem)
+
+    return map;
+  }
+
+  /// This method returns Json String [ParkedBillItem]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [ParkedBillItem]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [
+      pLocalBillId,
+      itemId,
+      pBillId,
+      image,
+      quantity,
+      subtotal,
+      tax,
+      discount,
+      netAmount,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [
+      id,
+      pLocalBillId,
+      itemId,
+      pBillId,
+      image,
+      quantity,
+      subtotal,
+      tax,
+      discount,
+      netAmount,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  static Future<List<ParkedBillItem>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ParkedBillItem.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<ParkedBillItem>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <ParkedBillItem>[];
+    try {
+      objList = list
+          .map((parkedbillitem) =>
+              ParkedBillItem.fromMap(parkedbillitem as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ParkedBillItem.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<ParkedBillItem>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<ParkedBillItem> objList = <ParkedBillItem>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = ParkedBillItem.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+      // final List<String> _loadedFields = List<String>.from(loadedFields);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('parkedBillItems.plParkedBillItemTaxs') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plParkedBillItemTaxs'))) {
+          /*_loadedfields!.add('parkedBillItems.plParkedBillItemTaxs'); */ obj
+                  .plParkedBillItemTaxs =
+              obj.plParkedBillItemTaxs ??
+                  await obj.getParkedBillItemTaxs()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plParkedBill'))) {
+          obj.plParkedBill = obj.plParkedBill ??
+              await obj.getParkedBill(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns ParkedBillItem by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [ParkedBillItem] if exist, otherwise returns null
+  Future<ParkedBillItem?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    ParkedBillItem? obj;
+    final data = await _mnParkedBillItem.getById([id]);
+    if (data.length != 0) {
+      obj = ParkedBillItem.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('parkedBillItems.plParkedBillItemTaxs') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plParkedBillItemTaxs'))) {
+          /*_loadedfields!.add('parkedBillItems.plParkedBillItemTaxs'); */ obj
+                  .plParkedBillItemTaxs =
+              obj.plParkedBillItemTaxs ??
+                  await obj.getParkedBillItemTaxs()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plParkedBill'))) {
+          obj.plParkedBill = obj.plParkedBill ??
+              await obj.getParkedBill(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (ParkedBillItem) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnParkedBillItem.insert(this, ignoreBatch);
+    } else {
+      await _mnParkedBillItem.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (ParkedBillItem) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnParkedBillItem.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnParkedBillItem.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs ParkedBillItem. Returns a new Primary Key value of ParkedBillItem
+
+  /// <returns>Returns a new Primary Key value of ParkedBillItem
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<ParkedBillItem> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(List<ParkedBillItem> parkedbillitems,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await MyDbModel().batchStart();
+    for (final obj in parkedbillitems) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await MyDbModel().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < parkedbillitems.length; i++) {
+        if (parkedbillitems[i].id == null) {
+          parkedbillitems[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnParkedBillItem.rawInsert(
+          'INSERT OR REPLACE INTO parkedBillItems (id, pLocalBillId, itemId, pBillId, image, quantity, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          [
+            id,
+            pLocalBillId,
+            itemId,
+            pBillId,
+            image,
+            quantity,
+            subtotal,
+            tax,
+            discount,
+            netAmount,
+            dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+          ],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'ParkedBillItem id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false,
+            errorMessage: 'ParkedBillItem id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage: 'ParkedBillItem Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<ParkedBillItem>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(List<ParkedBillItem> parkedbillitems,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    final results = await _mnParkedBillItem.rawInsertAll(
+        'INSERT OR REPLACE INTO parkedBillItems (id, pLocalBillId, itemId, pBillId, image, quantity, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+        parkedbillitems,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes ParkedBillItem
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete ParkedBillItem invoked (id=$id)');
+    var result = BoolResult(success: false);
+    {
+      result = await ParkedBillItemTax()
+          .select()
+          .pLocalItemId
+          .equals(id)
+          .and
+          .delete(hardDelete);
+    }
+    if (!result.success) {
+      return result;
+    }
+    if (!_softDeleteActivated || hardDelete) {
+      return _mnParkedBillItem
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnParkedBillItem.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) {
+    // not implemented because:
+    final msg =
+        'set useSoftDeleting:true in the table definition of [ParkedBillItem] to use this feature';
+    throw UnimplementedError(msg);
+  }
+
+  @override
+  ParkedBillItemFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ParkedBillItemFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ParkedBillItemFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    subtotal = subtotal ?? 0;
+    tax = tax ?? 0;
+    discount = discount ?? 0;
+    netAmount = netAmount ?? 0;
+    dateCreated = dateCreated ?? DateTime.now();
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion parkedbillitem
+
+// region ParkedBillItemField
+class ParkedBillItemField extends FilterBase {
+  ParkedBillItemField(ParkedBillItemFilterBuilder parkedbillitemFB)
+      : super(parkedbillitemFB);
+
+  @override
+  ParkedBillItemFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder isNull() {
+    return super.isNull() as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as ParkedBillItemFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemField get not {
+    return super.not as ParkedBillItemField;
+  }
+}
+// endregion ParkedBillItemField
+
+// region ParkedBillItemFilterBuilder
+class ParkedBillItemFilterBuilder extends ConjunctionBase {
+  ParkedBillItemFilterBuilder(ParkedBillItem obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnParkedBillItem = obj._mnParkedBillItem;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  ParkedBillItemManager? _mnParkedBillItem;
+
+  /// put the sql keyword 'AND'
+  @override
+  ParkedBillItemFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  ParkedBillItemFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  ParkedBillItemFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  ParkedBillItemFilterBuilder where(String? whereCriteria,
+      {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  ParkedBillItemFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  ParkedBillItemFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  ParkedBillItemFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ParkedBillItemFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ParkedBillItemFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ParkedBillItemFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ParkedBillItemFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  ParkedBillItemField _setField(
+      ParkedBillItemField? field, String colName, DbType dbtype) {
+    return ParkedBillItemField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  ParkedBillItemField? _id;
+  ParkedBillItemField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  ParkedBillItemField? _pLocalBillId;
+  ParkedBillItemField get pLocalBillId {
+    return _pLocalBillId =
+        _setField(_pLocalBillId, 'pLocalBillId', DbType.integer);
+  }
+
+  ParkedBillItemField? _itemId;
+  ParkedBillItemField get itemId {
+    return _itemId = _setField(_itemId, 'itemId', DbType.text);
+  }
+
+  ParkedBillItemField? _pBillId;
+  ParkedBillItemField get pBillId {
+    return _pBillId = _setField(_pBillId, 'pBillId', DbType.text);
+  }
+
+  ParkedBillItemField? _image;
+  ParkedBillItemField get image {
+    return _image = _setField(_image, 'image', DbType.text);
+  }
+
+  ParkedBillItemField? _quantity;
+  ParkedBillItemField get quantity {
+    return _quantity = _setField(_quantity, 'quantity', DbType.numeric);
+  }
+
+  ParkedBillItemField? _subtotal;
+  ParkedBillItemField get subtotal {
+    return _subtotal = _setField(_subtotal, 'subtotal', DbType.numeric);
+  }
+
+  ParkedBillItemField? _tax;
+  ParkedBillItemField get tax {
+    return _tax = _setField(_tax, 'tax', DbType.numeric);
+  }
+
+  ParkedBillItemField? _discount;
+  ParkedBillItemField get discount {
+    return _discount = _setField(_discount, 'discount', DbType.numeric);
+  }
+
+  ParkedBillItemField? _netAmount;
+  ParkedBillItemField get netAmount {
+    return _netAmount = _setField(_netAmount, 'netAmount', DbType.numeric);
+  }
+
+  ParkedBillItemField? _dateCreated;
+  ParkedBillItemField get dateCreated {
+    return _dateCreated =
+        _setField(_dateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  /// Deletes List<ParkedBillItem> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+    // Delete sub records where in (ParkedBillItemTax) according to DeleteRule.CASCADE
+    final idListParkedBillItemTaxBYpLocalItemId = toListPrimaryKeySQL(false);
+    final resParkedBillItemTaxBYpLocalItemId = await ParkedBillItemTax()
+        .select()
+        .where(
+            'pLocalItemId IN (${idListParkedBillItemTaxBYpLocalItemId['sql']})',
+            parameterValue: idListParkedBillItemTaxBYpLocalItemId['args'])
+        .delete(hardDelete);
+    if (!resParkedBillItemTaxBYpLocalItemId.success) {
+      return resParkedBillItemTaxBYpLocalItemId;
+    }
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnParkedBillItem!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnParkedBillItem!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from parkedBillItems ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnParkedBillItem!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [ParkedBillItem] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ParkedBillItem?
+  @override
+  Future<ParkedBillItem?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnParkedBillItem!.toList(qparams);
+    final data = await objFuture;
+    ParkedBillItem? obj;
+    if (data.isNotEmpty) {
+      obj = ParkedBillItem.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('parkedBillItems.plParkedBillItemTaxs') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plParkedBillItemTaxs'))) {
+          /*_loadedfields!.add('parkedBillItems.plParkedBillItemTaxs'); */ obj
+                  .plParkedBillItemTaxs =
+              obj.plParkedBillItemTaxs ??
+                  await obj.getParkedBillItemTaxs()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plParkedBill'))) {
+          obj.plParkedBill = obj.plParkedBill ??
+              await obj.getParkedBill(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [ParkedBillItem]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ParkedBillItem?
+  @override
+  Future<ParkedBillItem> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        ParkedBillItem();
+  }
+
+  /// This method returns int. [ParkedBillItem]
+  /// <returns>int
+  @override
+  Future<int> toCount(
+      [VoidCallback Function(int c)? parkedbillitemCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final parkedbillitemsFuture = await _mnParkedBillItem!.toList(qparams);
+    final int count = parkedbillitemsFuture[0]['CNT'] as int;
+    if (parkedbillitemCount != null) {
+      parkedbillitemCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<ParkedBillItem> [ParkedBillItem]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<ParkedBillItem>
+  @override
+  Future<List<ParkedBillItem>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<ParkedBillItem> parkedbillitemsData =
+        await ParkedBillItem.fromMapList(data,
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields,
+            setDefaultValues: qparams.selectColumns == null);
+    return parkedbillitemsData;
+  }
+
+  /// This method returns Json String [ParkedBillItem]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [ParkedBillItem]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [ParkedBillItem]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnParkedBillItem!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [ParkedBillItem]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] =
+        'SELECT `id` FROM parkedBillItems WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnParkedBillItem!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [ParkedBillItem]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnParkedBillItem!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await ParkedBillItem.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnParkedBillItem!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion ParkedBillItemFilterBuilder
+
+// region ParkedBillItemFields
+class ParkedBillItemFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fPLocalBillId;
+  static TableField get pLocalBillId {
+    return _fPLocalBillId = _fPLocalBillId ??
+        SqlSyntax.setField(_fPLocalBillId, 'pLocalBillId', DbType.integer);
+  }
+
+  static TableField? _fItemId;
+  static TableField get itemId {
+    return _fItemId =
+        _fItemId ?? SqlSyntax.setField(_fItemId, 'itemId', DbType.text);
+  }
+
+  static TableField? _fPBillId;
+  static TableField get pBillId {
+    return _fPBillId =
+        _fPBillId ?? SqlSyntax.setField(_fPBillId, 'pBillId', DbType.text);
+  }
+
+  static TableField? _fImage;
+  static TableField get image {
+    return _fImage =
+        _fImage ?? SqlSyntax.setField(_fImage, 'image', DbType.text);
+  }
+
+  static TableField? _fQuantity;
+  static TableField get quantity {
+    return _fQuantity = _fQuantity ??
+        SqlSyntax.setField(_fQuantity, 'quantity', DbType.numeric);
+  }
+
+  static TableField? _fSubtotal;
+  static TableField get subtotal {
+    return _fSubtotal = _fSubtotal ??
+        SqlSyntax.setField(_fSubtotal, 'subtotal', DbType.numeric);
+  }
+
+  static TableField? _fTax;
+  static TableField get tax {
+    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.numeric);
+  }
+
+  static TableField? _fDiscount;
+  static TableField get discount {
+    return _fDiscount = _fDiscount ??
+        SqlSyntax.setField(_fDiscount, 'discount', DbType.numeric);
+  }
+
+  static TableField? _fNetAmount;
+  static TableField get netAmount {
+    return _fNetAmount = _fNetAmount ??
+        SqlSyntax.setField(_fNetAmount, 'netAmount', DbType.numeric);
+  }
+
+  static TableField? _fDateCreated;
+  static TableField get dateCreated {
+    return _fDateCreated = _fDateCreated ??
+        SqlSyntax.setField(_fDateCreated, 'dateCreated', DbType.datetime);
+  }
+}
+// endregion ParkedBillItemFields
+
+//region ParkedBillItemManager
+class ParkedBillItemManager extends SqfEntityProvider {
+  ParkedBillItemManager()
+      : super(MyDbModel(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'parkedBillItems';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion ParkedBillItemManager
+// region ParkedBillItemTax
+class ParkedBillItemTax extends TableBase {
+  ParkedBillItemTax(
+      {this.id,
+      this.pLocalItemId,
+      this.taxId,
+      this.pItemId,
+      this.name,
+      this.taxMethod,
+      this.rate,
+      this.tax,
+      this.dateCreated}) {
+    _setDefaultValues();
+    softDeleteActivated = false;
+  }
+  ParkedBillItemTax.withFields(this.pLocalItemId, this.taxId, this.pItemId,
+      this.name, this.taxMethod, this.rate, this.tax, this.dateCreated) {
+    _setDefaultValues();
+  }
+  ParkedBillItemTax.withId(this.id, this.pLocalItemId, this.taxId, this.pItemId,
+      this.name, this.taxMethod, this.rate, this.tax, this.dateCreated) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  ParkedBillItemTax.fromMap(Map<String, dynamic> o,
+      {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    pLocalItemId = int.tryParse(o['pLocalItemId'].toString());
+
+    if (o['taxId'] != null) {
+      taxId = o['taxId'].toString();
+    }
+    if (o['pItemId'] != null) {
+      pItemId = o['pItemId'].toString();
+    }
+    if (o['name'] != null) {
+      name = o['name'].toString();
+    }
+    if (o['taxMethod'] != null) {
+      taxMethod = o['taxMethod'].toString();
+    }
+    if (o['rate'] != null) {
+      rate = int.tryParse(o['rate'].toString());
+    }
+    if (o['tax'] != null) {
+      tax = int.tryParse(o['tax'].toString());
+    }
+    if (o['dateCreated'] != null) {
+      dateCreated = int.tryParse(o['dateCreated'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['dateCreated'].toString())!)
+          : DateTime.tryParse(o['dateCreated'].toString());
+    }
+
+    // RELATIONSHIPS FromMAP
+    plParkedBillItem = o['parkedBillItem'] != null
+        ? ParkedBillItem.fromMap(o['parkedBillItem'] as Map<String, dynamic>)
+        : null;
+    // END RELATIONSHIPS FromMAP
+  }
+  // FIELDS (ParkedBillItemTax)
+  int? id;
+  int? pLocalItemId;
+  String? taxId;
+  String? pItemId;
+  String? name;
+  String? taxMethod;
+  int? rate;
+  int? tax;
+  DateTime? dateCreated;
+
+  // end FIELDS (ParkedBillItemTax)
+
+// RELATIONSHIPS (ParkedBillItemTax)
+  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plParkedBillItem', 'plField2'..]) or so on..
+  ParkedBillItem? plParkedBillItem;
+
+  /// get ParkedBillItem By PLocalItemId
+  Future<ParkedBillItem?> getParkedBillItem(
+      {bool loadParents = false, List<String>? loadedFields}) async {
+    final _obj = await ParkedBillItem().getById(pLocalItemId,
+        loadParents: loadParents, loadedFields: loadedFields);
+    return _obj;
+  }
+  // END RELATIONSHIPS (ParkedBillItemTax)
+
+  static const bool _softDeleteActivated = false;
+  ParkedBillItemTaxManager? __mnParkedBillItemTax;
+
+  ParkedBillItemTaxManager get _mnParkedBillItemTax {
+    return __mnParkedBillItemTax =
+        __mnParkedBillItemTax ?? ParkedBillItemTaxManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (pLocalItemId != null) {
+      map['pLocalItemId'] = forView
+          ? plParkedBillItem == null
+              ? pLocalItemId
+              : plParkedBillItem!.itemId
+          : pLocalItemId;
+    } else if (pLocalItemId != null || !forView) {
+      map['pLocalItemId'] = null;
+    }
+    if (taxId != null || !forView) {
+      map['taxId'] = taxId;
+    }
+    if (pItemId != null || !forView) {
+      map['pItemId'] = pItemId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (taxMethod != null || !forView) {
+      map['taxMethod'] = taxMethod;
+    }
+    if (rate != null || !forView) {
+      map['rate'] = rate;
+    }
+    if (tax != null || !forView) {
+      map['tax'] = tax;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (pLocalItemId != null) {
+      map['pLocalItemId'] = forView
+          ? plParkedBillItem == null
+              ? pLocalItemId
+              : plParkedBillItem!.itemId
+          : pLocalItemId;
+    } else if (pLocalItemId != null || !forView) {
+      map['pLocalItemId'] = null;
+    }
+    if (taxId != null || !forView) {
+      map['taxId'] = taxId;
+    }
+    if (pItemId != null || !forView) {
+      map['pItemId'] = pItemId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (taxMethod != null || !forView) {
+      map['taxMethod'] = taxMethod;
+    }
+    if (rate != null || !forView) {
+      map['rate'] = rate;
+    }
+    if (tax != null || !forView) {
+      map['tax'] = tax;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+    return map;
+  }
+
+  /// This method returns Json String [ParkedBillItemTax]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [ParkedBillItemTax]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [
+      pLocalItemId,
+      taxId,
+      pItemId,
+      name,
+      taxMethod,
+      rate,
+      tax,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [
+      id,
+      pLocalItemId,
+      taxId,
+      pItemId,
+      name,
+      taxMethod,
+      rate,
+      tax,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  static Future<List<ParkedBillItemTax>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ParkedBillItemTax.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<ParkedBillItemTax>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <ParkedBillItemTax>[];
+    try {
+      objList = list
+          .map((parkedbillitemtax) => ParkedBillItemTax.fromMap(
+              parkedbillitemtax as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ParkedBillItemTax.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<ParkedBillItemTax>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<ParkedBillItemTax> objList = <ParkedBillItemTax>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = ParkedBillItemTax.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+      // final List<String> _loadedFields = List<String>.from(loadedFields);
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plParkedBillItem'))) {
+          obj.plParkedBillItem = obj.plParkedBillItem ??
+              await obj.getParkedBillItem(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns ParkedBillItemTax by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [ParkedBillItemTax] if exist, otherwise returns null
+  Future<ParkedBillItemTax?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    ParkedBillItemTax? obj;
+    final data = await _mnParkedBillItemTax.getById([id]);
+    if (data.length != 0) {
+      obj = ParkedBillItemTax.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plParkedBillItem'))) {
+          obj.plParkedBillItem = obj.plParkedBillItem ??
+              await obj.getParkedBillItem(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (ParkedBillItemTax) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnParkedBillItemTax.insert(this, ignoreBatch);
+    } else {
+      await _mnParkedBillItemTax.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (ParkedBillItemTax) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnParkedBillItemTax.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnParkedBillItemTax.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs ParkedBillItemTax. Returns a new Primary Key value of ParkedBillItemTax
+
+  /// <returns>Returns a new Primary Key value of ParkedBillItemTax
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<ParkedBillItemTax> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(
+      List<ParkedBillItemTax> parkedbillitemtaxs,
+      {bool? exclusive,
+      bool? noResult,
+      bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await MyDbModel().batchStart();
+    for (final obj in parkedbillitemtaxs) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await MyDbModel().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < parkedbillitemtaxs.length; i++) {
+        if (parkedbillitemtaxs[i].id == null) {
+          parkedbillitemtaxs[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnParkedBillItemTax.rawInsert(
+          'INSERT OR REPLACE INTO parkedBillItemTaxes (id, pLocalItemId, taxId, pItemId, name, taxMethod, rate, tax, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?)',
+          [
+            id,
+            pLocalItemId,
+            taxId,
+            pItemId,
+            name,
+            taxMethod,
+            rate,
+            tax,
+            dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+          ],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'ParkedBillItemTax id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false,
+            errorMessage: 'ParkedBillItemTax id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage:
+              'ParkedBillItemTax Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<ParkedBillItemTax>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(List<ParkedBillItemTax> parkedbillitemtaxs,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    final results = await _mnParkedBillItemTax.rawInsertAll(
+        'INSERT OR REPLACE INTO parkedBillItemTaxes (id, pLocalItemId, taxId, pItemId, name, taxMethod, rate, tax, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?)',
+        parkedbillitemtaxs,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes ParkedBillItemTax
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete ParkedBillItemTax invoked (id=$id)');
+    if (!_softDeleteActivated || hardDelete) {
+      return _mnParkedBillItemTax
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnParkedBillItemTax.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) {
+    // not implemented because:
+    final msg =
+        'set useSoftDeleting:true in the table definition of [ParkedBillItemTax] to use this feature';
+    throw UnimplementedError(msg);
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ParkedBillItemTaxFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ParkedBillItemTaxFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    dateCreated = dateCreated ?? DateTime.now();
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion parkedbillitemtax
+
+// region ParkedBillItemTaxField
+class ParkedBillItemTaxField extends FilterBase {
+  ParkedBillItemTaxField(ParkedBillItemTaxFilterBuilder parkedbillitemtaxFB)
+      : super(parkedbillitemtaxFB);
+
+  @override
+  ParkedBillItemTaxFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder isNull() {
+    return super.isNull() as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as ParkedBillItemTaxFilterBuilder;
+  }
+
+  @override
+  ParkedBillItemTaxField get not {
+    return super.not as ParkedBillItemTaxField;
+  }
+}
+// endregion ParkedBillItemTaxField
+
+// region ParkedBillItemTaxFilterBuilder
+class ParkedBillItemTaxFilterBuilder extends ConjunctionBase {
+  ParkedBillItemTaxFilterBuilder(ParkedBillItemTax obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnParkedBillItemTax = obj._mnParkedBillItemTax;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  ParkedBillItemTaxManager? _mnParkedBillItemTax;
+
+  /// put the sql keyword 'AND'
+  @override
+  ParkedBillItemTaxFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  ParkedBillItemTaxFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  ParkedBillItemTaxFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  ParkedBillItemTaxFilterBuilder where(String? whereCriteria,
+      {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  ParkedBillItemTaxFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  ParkedBillItemTaxFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  ParkedBillItemTaxFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ParkedBillItemTaxFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ParkedBillItemTaxFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ParkedBillItemTaxFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ParkedBillItemTaxFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  ParkedBillItemTaxField _setField(
+      ParkedBillItemTaxField? field, String colName, DbType dbtype) {
+    return ParkedBillItemTaxField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  ParkedBillItemTaxField? _id;
+  ParkedBillItemTaxField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  ParkedBillItemTaxField? _pLocalItemId;
+  ParkedBillItemTaxField get pLocalItemId {
+    return _pLocalItemId =
+        _setField(_pLocalItemId, 'pLocalItemId', DbType.integer);
+  }
+
+  ParkedBillItemTaxField? _taxId;
+  ParkedBillItemTaxField get taxId {
+    return _taxId = _setField(_taxId, 'taxId', DbType.text);
+  }
+
+  ParkedBillItemTaxField? _pItemId;
+  ParkedBillItemTaxField get pItemId {
+    return _pItemId = _setField(_pItemId, 'pItemId', DbType.text);
+  }
+
+  ParkedBillItemTaxField? _name;
+  ParkedBillItemTaxField get name {
+    return _name = _setField(_name, 'name', DbType.text);
+  }
+
+  ParkedBillItemTaxField? _taxMethod;
+  ParkedBillItemTaxField get taxMethod {
+    return _taxMethod = _setField(_taxMethod, 'taxMethod', DbType.text);
+  }
+
+  ParkedBillItemTaxField? _rate;
+  ParkedBillItemTaxField get rate {
+    return _rate = _setField(_rate, 'rate', DbType.numeric);
+  }
+
+  ParkedBillItemTaxField? _tax;
+  ParkedBillItemTaxField get tax {
+    return _tax = _setField(_tax, 'tax', DbType.numeric);
+  }
+
+  ParkedBillItemTaxField? _dateCreated;
+  ParkedBillItemTaxField get dateCreated {
+    return _dateCreated =
+        _setField(_dateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  /// Deletes List<ParkedBillItemTax> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnParkedBillItemTax!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnParkedBillItemTax!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from parkedBillItemTaxes ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnParkedBillItemTax!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [ParkedBillItemTax] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ParkedBillItemTax?
+  @override
+  Future<ParkedBillItemTax?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnParkedBillItemTax!.toList(qparams);
+    final data = await objFuture;
+    ParkedBillItemTax? obj;
+    if (data.isNotEmpty) {
+      obj = ParkedBillItemTax.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plParkedBillItem'))) {
+          obj.plParkedBillItem = obj.plParkedBillItem ??
+              await obj.getParkedBillItem(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [ParkedBillItemTax]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ParkedBillItemTax?
+  @override
+  Future<ParkedBillItemTax> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        ParkedBillItemTax();
+  }
+
+  /// This method returns int. [ParkedBillItemTax]
+  /// <returns>int
+  @override
+  Future<int> toCount(
+      [VoidCallback Function(int c)? parkedbillitemtaxCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final parkedbillitemtaxsFuture =
+        await _mnParkedBillItemTax!.toList(qparams);
+    final int count = parkedbillitemtaxsFuture[0]['CNT'] as int;
+    if (parkedbillitemtaxCount != null) {
+      parkedbillitemtaxCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<ParkedBillItemTax> [ParkedBillItemTax]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<ParkedBillItemTax>
+  @override
+  Future<List<ParkedBillItemTax>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<ParkedBillItemTax> parkedbillitemtaxsData =
+        await ParkedBillItemTax.fromMapList(data,
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields,
+            setDefaultValues: qparams.selectColumns == null);
+    return parkedbillitemtaxsData;
+  }
+
+  /// This method returns Json String [ParkedBillItemTax]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [ParkedBillItemTax]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [ParkedBillItemTax]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnParkedBillItemTax!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [ParkedBillItemTax]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] =
+        'SELECT `id` FROM parkedBillItemTaxes WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnParkedBillItemTax!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [ParkedBillItemTax]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnParkedBillItemTax!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await ParkedBillItemTax.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnParkedBillItemTax!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion ParkedBillItemTaxFilterBuilder
+
+// region ParkedBillItemTaxFields
+class ParkedBillItemTaxFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fPLocalItemId;
+  static TableField get pLocalItemId {
+    return _fPLocalItemId = _fPLocalItemId ??
+        SqlSyntax.setField(_fPLocalItemId, 'pLocalItemId', DbType.integer);
+  }
+
+  static TableField? _fTaxId;
+  static TableField get taxId {
+    return _fTaxId =
+        _fTaxId ?? SqlSyntax.setField(_fTaxId, 'taxId', DbType.text);
+  }
+
+  static TableField? _fPItemId;
+  static TableField get pItemId {
+    return _fPItemId =
+        _fPItemId ?? SqlSyntax.setField(_fPItemId, 'pItemId', DbType.text);
+  }
+
+  static TableField? _fName;
+  static TableField get name {
+    return _fName = _fName ?? SqlSyntax.setField(_fName, 'name', DbType.text);
+  }
+
+  static TableField? _fTaxMethod;
+  static TableField get taxMethod {
+    return _fTaxMethod = _fTaxMethod ??
+        SqlSyntax.setField(_fTaxMethod, 'taxMethod', DbType.text);
+  }
+
+  static TableField? _fRate;
+  static TableField get rate {
+    return _fRate =
+        _fRate ?? SqlSyntax.setField(_fRate, 'rate', DbType.numeric);
+  }
+
+  static TableField? _fTax;
+  static TableField get tax {
+    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.numeric);
+  }
+
+  static TableField? _fDateCreated;
+  static TableField get dateCreated {
+    return _fDateCreated = _fDateCreated ??
+        SqlSyntax.setField(_fDateCreated, 'dateCreated', DbType.datetime);
+  }
+}
+// endregion ParkedBillItemTaxFields
+
+//region ParkedBillItemTaxManager
+class ParkedBillItemTaxManager extends SqfEntityProvider {
+  ParkedBillItemTaxManager()
+      : super(MyDbModel(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'parkedBillItemTaxes';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion ParkedBillItemTaxManager
 /// Region SEQUENCE IdentitySequence
 class IdentitySequence {
   /// Assigns a new value when it is triggered and returns the new value

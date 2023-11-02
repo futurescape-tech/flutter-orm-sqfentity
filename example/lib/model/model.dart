@@ -67,6 +67,68 @@ const tableProduct = SqfEntityTable(
           maxValue: 'DateTime.now().add(Duration(days: 365))')
     ]);
 
+const tableParkedBills = SqfEntityTable(
+  tableName: 'parkedBills',
+  modelName: 'ParkedBill',
+  primaryKeyName: 'id',
+  primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+  useSoftDeleting: false,
+  fields: [
+    SqfEntityField('billId', DbType.text, isUnique: true),
+    SqfEntityField('name', DbType.text, isUnique: true),
+    SqfEntityField('subtotal', DbType.numeric, defaultValue: 0),
+    SqfEntityField('tax', DbType.numeric, defaultValue: 0),
+    SqfEntityField('discount', DbType.numeric, defaultValue: 0),
+    SqfEntityField('netAmount', DbType.numeric, defaultValue: 0),
+  ]
+);
+
+const tableParkedBillItems = SqfEntityTable(
+  tableName: 'parkedBillItems',
+  modelName: 'ParkedBillItem',
+  primaryKeyName: 'id',
+  primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+  useSoftDeleting: false,
+  fields: [
+    SqfEntityFieldRelationship(
+      parentTable: tableParkedBills,
+      deleteRule: DeleteRule.CASCADE,
+      relationType: RelationType.ONE_TO_MANY,
+      fieldName: 'pLocalBillId'
+    ),
+    SqfEntityField('itemId', DbType.text, isUnique: true),
+    SqfEntityField('pBillId', DbType.text),
+    SqfEntityField('image', DbType.text),
+    SqfEntityField('quantity', DbType.numeric),
+    SqfEntityField('subtotal', DbType.numeric, defaultValue: 0),
+    SqfEntityField('tax', DbType.numeric, defaultValue: 0),
+    SqfEntityField('discount', DbType.numeric, defaultValue: 0),
+    SqfEntityField('netAmount', DbType.numeric, defaultValue: 0),
+  ]
+);
+
+const tableParkedBillItemTaxes = SqfEntityTable(
+  tableName: 'parkedBillItemTaxes',
+  modelName: 'ParkedBillItemTax',
+  primaryKeyName: 'id',
+  primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+  useSoftDeleting: false,
+  fields: [
+    SqfEntityFieldRelationship(
+      parentTable: tableParkedBillItems,
+      deleteRule: DeleteRule.CASCADE,
+      relationType: RelationType.ONE_TO_MANY,
+      fieldName: 'pLocalItemId'
+    ),
+    SqfEntityField('taxId', DbType.text, isUnique: true),
+    SqfEntityField('pItemId', DbType.text),
+    SqfEntityField('name', DbType.text),
+    SqfEntityField('taxMethod', DbType.text),
+    SqfEntityField('rate', DbType.numeric),
+    SqfEntityField('tax', DbType.numeric)
+  ]
+);
+
 // Define the 'Todo' constant as SqfEntityTable.
 const tableTodo = SqfEntityTable(
     tableName: 'todos',
@@ -106,7 +168,7 @@ const myDbModel = SqfEntityModel(
     password:
         null, // You can set a password if you want to use crypted database (For more information: https://github.com/sqlcipher/sqlcipher)
     // put defined tables into the tables list.
-    databaseTables: [tableProduct, tableCategory, tableTodo],
+    databaseTables: [tableProduct, tableCategory, tableTodo, tableParkedBills, tableParkedBillItems, tableParkedBillItemTaxes],
     // You can define tables to generate add/edit view forms if you want to use Form Generator property
     formTables: [tableProduct, tableCategory, tableTodo],
     // put defined sequences into the sequences list.

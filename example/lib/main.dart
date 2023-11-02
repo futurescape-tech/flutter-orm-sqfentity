@@ -86,6 +86,8 @@ Future<bool> runSamples() async {
   // create model from existing database sample
   await createModelFromDatabaseSample();
 
+  await test1();
+
   return true;
 }
 
@@ -1025,4 +1027,27 @@ Future<bool> addProducts() async {
     debugPrint('added 5 dummy products');
   }
   return true;
+}
+
+Future<void> test1() async {
+  final product = await Product()
+      .select(columnsToSelect: [])
+      .startBlock
+      .price
+      .between(11000, 13000)
+      .endBlock
+      .and
+      .startBlock
+      .isActive
+      .equals(true)
+      .endBlock
+      .toSingle();
+  
+  print('KLM Product = ${product?.toMap()}');
+  print('KLM Product Type = ${product.runtimeType}');
+
+  final category = await product?.getCategory();
+
+  print('KLM Category = ${category?.toMap()}');
+  print('KLM Category Type = ${category.runtimeType}');
 }

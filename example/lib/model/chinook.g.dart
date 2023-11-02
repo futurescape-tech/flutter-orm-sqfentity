@@ -344,14 +344,14 @@ class TablePlaylistTrack extends SqfEntityTableBase {
     // declare fields
     fields = [
       SqfEntityFieldRelationshipBase(
-          TableTrack.getInstance, DeleteRule.NO_ACTION,
-          relationType: RelationType.ONE_TO_MANY,
-          fieldName: 'TrackId',
-          isPrimaryKeyField: true),
-      SqfEntityFieldRelationshipBase(
           TablePlaylist.getInstance, DeleteRule.NO_ACTION,
           relationType: RelationType.ONE_TO_MANY,
           fieldName: 'PlaylistId',
+          isPrimaryKeyField: true),
+      SqfEntityFieldRelationshipBase(
+          TableTrack.getInstance, DeleteRule.NO_ACTION,
+          relationType: RelationType.ONE_TO_MANY,
+          fieldName: 'TrackId',
           isPrimaryKeyField: true),
     ];
     super.init();
@@ -12070,14 +12070,14 @@ class VTrackManager extends SqfEntityProvider {
 //endregion VTrackManager
 // region PlaylistTrack
 class PlaylistTrack extends TableBase {
-  PlaylistTrack({this.TrackId, this.PlaylistId}) {
+  PlaylistTrack({this.PlaylistId, this.TrackId}) {
     _setDefaultValues();
     softDeleteActivated = false;
   }
-  PlaylistTrack.withFields(this.TrackId, this.PlaylistId) {
+  PlaylistTrack.withFields(this.PlaylistId, this.TrackId) {
     _setDefaultValues();
   }
-  PlaylistTrack.withId(this.TrackId, this.PlaylistId) {
+  PlaylistTrack.withId(this.PlaylistId, this.TrackId) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -12086,40 +12086,28 @@ class PlaylistTrack extends TableBase {
     if (setDefaultValues) {
       _setDefaultValues();
     }
-    TrackId = int.tryParse(o['TrackId'].toString());
-
     PlaylistId = int.tryParse(o['PlaylistId'].toString());
 
+    TrackId = int.tryParse(o['TrackId'].toString());
+
     // RELATIONSHIPS FromMAP
-    plTrack = o['track'] != null
-        ? Track.fromMap(o['track'] as Map<String, dynamic>)
-        : null;
     plPlaylist = o['playlist'] != null
         ? Playlist.fromMap(o['playlist'] as Map<String, dynamic>)
+        : null;
+    plTrack = o['track'] != null
+        ? Track.fromMap(o['track'] as Map<String, dynamic>)
         : null;
     // END RELATIONSHIPS FromMAP
 
     isSaved = true;
   }
   // FIELDS (PlaylistTrack)
-  int? TrackId;
   int? PlaylistId;
+  int? TrackId;
   bool? isSaved;
   // end FIELDS (PlaylistTrack)
 
 // RELATIONSHIPS (PlaylistTrack)
-  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
-  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plTrack', 'plField2'..]) or so on..
-  Track? plTrack;
-
-  /// get Track By TrackId
-  Future<Track?> getTrack(
-      {bool loadParents = false, List<String>? loadedFields}) async {
-    final _obj = await Track()
-        .getById(TrackId, loadParents: loadParents, loadedFields: loadedFields);
-    return _obj;
-  }
-
   /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
   /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plPlaylist', 'plField2'..]) or so on..
   Playlist? plPlaylist;
@@ -12129,6 +12117,18 @@ class PlaylistTrack extends TableBase {
       {bool loadParents = false, List<String>? loadedFields}) async {
     final _obj = await Playlist().getById(PlaylistId,
         loadParents: loadParents, loadedFields: loadedFields);
+    return _obj;
+  }
+
+  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plTrack', 'plField2'..]) or so on..
+  Track? plTrack;
+
+  /// get Track By TrackId
+  Future<Track?> getTrack(
+      {bool loadParents = false, List<String>? loadedFields}) async {
+    final _obj = await Track()
+        .getById(TrackId, loadParents: loadParents, loadedFields: loadedFields);
     return _obj;
   }
   // END RELATIONSHIPS (PlaylistTrack)
@@ -12145,15 +12145,6 @@ class PlaylistTrack extends TableBase {
   Map<String, dynamic> toMap(
       {bool forQuery = false, bool forJson = false, bool forView = false}) {
     final map = <String, dynamic>{};
-    if (TrackId != null) {
-      map['TrackId'] = forView
-          ? plTrack == null
-              ? TrackId
-              : plTrack!.Name
-          : TrackId;
-    } else if (TrackId != null || !forView) {
-      map['TrackId'] = null;
-    }
     if (PlaylistId != null) {
       map['PlaylistId'] = forView
           ? plPlaylist == null
@@ -12162,6 +12153,15 @@ class PlaylistTrack extends TableBase {
           : PlaylistId;
     } else if (PlaylistId != null || !forView) {
       map['PlaylistId'] = null;
+    }
+    if (TrackId != null) {
+      map['TrackId'] = forView
+          ? plTrack == null
+              ? TrackId
+              : plTrack!.Name
+          : TrackId;
+    } else if (TrackId != null || !forView) {
+      map['TrackId'] = null;
     }
 
     return map;
@@ -12173,15 +12173,6 @@ class PlaylistTrack extends TableBase {
       bool forJson = false,
       bool forView = false]) async {
     final map = <String, dynamic>{};
-    if (TrackId != null) {
-      map['TrackId'] = forView
-          ? plTrack == null
-              ? TrackId
-              : plTrack!.Name
-          : TrackId;
-    } else if (TrackId != null || !forView) {
-      map['TrackId'] = null;
-    }
     if (PlaylistId != null) {
       map['PlaylistId'] = forView
           ? plPlaylist == null
@@ -12190,6 +12181,15 @@ class PlaylistTrack extends TableBase {
           : PlaylistId;
     } else if (PlaylistId != null || !forView) {
       map['PlaylistId'] = null;
+    }
+    if (TrackId != null) {
+      map['TrackId'] = forView
+          ? plTrack == null
+              ? TrackId
+              : plTrack!.Name
+          : TrackId;
+    } else if (TrackId != null || !forView) {
+      map['TrackId'] = null;
     }
 
     return map;
@@ -12209,12 +12209,12 @@ class PlaylistTrack extends TableBase {
 
   @override
   List<dynamic> toArgs() {
-    return [TrackId, PlaylistId];
+    return [PlaylistId, TrackId];
   }
 
   @override
   List<dynamic> toArgsWithIds() {
-    return [TrackId, PlaylistId];
+    return [PlaylistId, TrackId];
   }
 
   static Future<List<PlaylistTrack>?> fromWebUrl(Uri uri,
@@ -12266,15 +12266,15 @@ class PlaylistTrack extends TableBase {
         loadedFields = loadedFields ?? [];
         if ((preloadFields == null ||
             loadParents ||
-            preloadFields.contains('plTrack'))) {
-          obj.plTrack =
-              obj.plTrack ?? await obj.getTrack(loadParents: loadParents);
-        }
-        if ((preloadFields == null ||
-            loadParents ||
             preloadFields.contains('plPlaylist'))) {
           obj.plPlaylist =
               obj.plPlaylist ?? await obj.getPlaylist(loadParents: loadParents);
+        }
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plTrack'))) {
+          obj.plTrack =
+              obj.plTrack ?? await obj.getTrack(loadParents: loadParents);
         }
       } // END RELATIONSHIPS PRELOAD
 
@@ -12284,7 +12284,7 @@ class PlaylistTrack extends TableBase {
   }
 
   /// returns PlaylistTrack by ID if exist, otherwise returns null
-  /// Primary Keys: int? TrackId, int? PlaylistId
+  /// Primary Keys: int? PlaylistId, int? TrackId
   /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
   /// ex: getById(preload:true) -> Loads all related objects
   /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
@@ -12292,16 +12292,16 @@ class PlaylistTrack extends TableBase {
   /// bool loadParents: if true, loads all parent objects until the object has no parent
 
   /// <returns>returns [PlaylistTrack] if exist, otherwise returns null
-  Future<PlaylistTrack?> getById(int? TrackId, int? PlaylistId,
+  Future<PlaylistTrack?> getById(int? PlaylistId, int? TrackId,
       {bool preload = false,
       List<String>? preloadFields,
       bool loadParents = false,
       List<String>? loadedFields}) async {
-    if (TrackId == null) {
+    if (PlaylistId == null) {
       return null;
     }
     PlaylistTrack? obj;
-    final data = await _mnPlaylistTrack.getById([TrackId, PlaylistId]);
+    final data = await _mnPlaylistTrack.getById([PlaylistId, TrackId]);
     if (data.length != 0) {
       obj = PlaylistTrack.fromMap(data[0] as Map<String, dynamic>);
 
@@ -12310,15 +12310,15 @@ class PlaylistTrack extends TableBase {
         loadedFields = loadedFields ?? [];
         if ((preloadFields == null ||
             loadParents ||
-            preloadFields.contains('plTrack'))) {
-          obj.plTrack =
-              obj.plTrack ?? await obj.getTrack(loadParents: loadParents);
-        }
-        if ((preloadFields == null ||
-            loadParents ||
             preloadFields.contains('plPlaylist'))) {
           obj.plPlaylist =
               obj.plPlaylist ?? await obj.getPlaylist(loadParents: loadParents);
+        }
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plTrack'))) {
+          obj.plTrack =
+              obj.plTrack ?? await obj.getTrack(loadParents: loadParents);
         }
       } // END RELATIONSHIPS PRELOAD
     } else {
@@ -12327,16 +12327,16 @@ class PlaylistTrack extends TableBase {
     return obj;
   }
 
-  /// Saves the (PlaylistTrack) object. If the Primary Key (TrackId) field is null, returns Error.
+  /// Saves the (PlaylistTrack) object. If the Primary Key (PlaylistId) field is null, returns Error.
   /// INSERTS (If not exist) OR REPLACES (If exist) data while Primary Key is not null.
-  /// Call the saveAs() method if you do not want to save it when there is another row with the same TrackId
+  /// Call the saveAs() method if you do not want to save it when there is another row with the same PlaylistId
   /// <returns>Returns BoolResult
   @override
   Future<BoolResult> save({bool ignoreBatch = true}) async {
     final result = BoolResult(success: false);
     try {
       await _mnPlaylistTrack.rawInsert(
-          'INSERT ${isSaved! ? 'OR REPLACE' : ''} INTO PlaylistTrack ( TrackId, PlaylistId)  VALUES (?,?)',
+          'INSERT ${isSaved! ? 'OR REPLACE' : ''} INTO PlaylistTrack ( PlaylistId, TrackId)  VALUES (?,?)',
           toArgsWithIds(),
           ignoreBatch);
       result.success = true;
@@ -12374,20 +12374,21 @@ class PlaylistTrack extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnPlaylistTrack.rawInsert(
-          'INSERT OR REPLACE INTO PlaylistTrack ( TrackId, PlaylistId)  VALUES (?,?)',
-          [TrackId, PlaylistId],
+          'INSERT OR REPLACE INTO PlaylistTrack ( PlaylistId, TrackId)  VALUES (?,?)',
+          [PlaylistId, TrackId],
           ignoreBatch);
       if (result! > 0) {
         saveResult = BoolResult(
             success: true,
             successMessage:
-                'PlaylistTrack TrackId=$TrackId updated successfully');
+                'PlaylistTrack PlaylistId=$PlaylistId updated successfully');
       } else {
         saveResult = BoolResult(
             success: false,
-            errorMessage: 'PlaylistTrack TrackId=$TrackId did not update');
+            errorMessage:
+                'PlaylistTrack PlaylistId=$PlaylistId did not update');
       }
-      return TrackId;
+      return PlaylistId;
     } catch (e) {
       saveResult = BoolResult(
           success: false,
@@ -12403,7 +12404,7 @@ class PlaylistTrack extends TableBase {
   Future<BoolCommitResult> upsertAll(List<PlaylistTrack> playlisttracks,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnPlaylistTrack.rawInsertAll(
-        'INSERT OR REPLACE INTO PlaylistTrack ( TrackId, PlaylistId)  VALUES (?,?)',
+        'INSERT OR REPLACE INTO PlaylistTrack ( PlaylistId, TrackId)  VALUES (?,?)',
         playlisttracks,
         exclusive: exclusive,
         noResult: noResult,
@@ -12416,16 +12417,17 @@ class PlaylistTrack extends TableBase {
   /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
   @override
   Future<BoolResult> delete([bool hardDelete = false]) async {
-    debugPrint('SQFENTITIY: delete PlaylistTrack invoked (TrackId=$TrackId)');
+    debugPrint(
+        'SQFENTITIY: delete PlaylistTrack invoked (PlaylistId=$PlaylistId)');
     if (!_softDeleteActivated || hardDelete) {
       return _mnPlaylistTrack.delete(QueryParams(
-          whereString: 'TrackId=? AND PlaylistId=?',
-          whereArguments: [TrackId, PlaylistId]));
+          whereString: 'PlaylistId=? AND TrackId=?',
+          whereArguments: [PlaylistId, TrackId]));
     } else {
       return _mnPlaylistTrack.updateBatch(
           QueryParams(
-              whereString: 'TrackId=? AND PlaylistId=?',
-              whereArguments: [TrackId, PlaylistId]),
+              whereString: 'PlaylistId=? AND TrackId=?',
+              whereArguments: [PlaylistId, TrackId]),
           {'isDeleted': 1});
     }
   }
@@ -12460,8 +12462,8 @@ class PlaylistTrack extends TableBase {
   @override
   void rollbackPk() {
     if (isInsert == true) {
-      TrackId = null;
       PlaylistId = null;
+      TrackId = null;
     }
   }
 
@@ -12665,14 +12667,14 @@ class PlaylistTrackFilterBuilder extends ConjunctionBase {
           dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
   }
 
-  PlaylistTrackField? _TrackId;
-  PlaylistTrackField get TrackId {
-    return _TrackId = _setField(_TrackId, 'TrackId', DbType.integer);
-  }
-
   PlaylistTrackField? _PlaylistId;
   PlaylistTrackField get PlaylistId {
     return _PlaylistId = _setField(_PlaylistId, 'PlaylistId', DbType.integer);
+  }
+
+  PlaylistTrackField? _TrackId;
+  PlaylistTrackField get TrackId {
+    return _TrackId = _setField(_TrackId, 'TrackId', DbType.integer);
   }
 
   /// Deletes List<PlaylistTrack> bulk by query
@@ -12699,7 +12701,7 @@ class PlaylistTrackFilterBuilder extends ConjunctionBase {
     buildParameters();
     if (qparams.limit! > 0 || qparams.offset! > 0) {
       qparams.whereString =
-          'TrackId IN (SELECT TrackId from PlaylistTrack ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+          'PlaylistId IN (SELECT PlaylistId from PlaylistTrack ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
     }
     return _mnPlaylistTrack!.updateBatch(qparams, values);
   }
@@ -12730,15 +12732,15 @@ class PlaylistTrackFilterBuilder extends ConjunctionBase {
         loadedFields = loadedFields ?? [];
         if ((preloadFields == null ||
             loadParents ||
-            preloadFields.contains('plTrack'))) {
-          obj.plTrack =
-              obj.plTrack ?? await obj.getTrack(loadParents: loadParents);
-        }
-        if ((preloadFields == null ||
-            loadParents ||
             preloadFields.contains('plPlaylist'))) {
           obj.plPlaylist =
               obj.plPlaylist ?? await obj.getPlaylist(loadParents: loadParents);
+        }
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plTrack'))) {
+          obj.plTrack =
+              obj.plTrack ?? await obj.getTrack(loadParents: loadParents);
         }
       } // END RELATIONSHIPS PRELOAD
     } else {
@@ -12849,20 +12851,20 @@ class PlaylistTrackFilterBuilder extends ConjunctionBase {
       buildParameters();
     }
     _retVal['sql'] =
-        'SELECT `TrackId`PlaylistId` FROM PlaylistTrack WHERE ${qparams.whereString}';
+        'SELECT `PlaylistId`TrackId` FROM PlaylistTrack WHERE ${qparams.whereString}';
     _retVal['args'] = qparams.whereArguments;
     return _retVal;
   }
 
-  /// This method returns Primary Key List<TrackId,PlaylistId> [PlaylistTrack]
-  /// <returns>List<TrackId,PlaylistId>
+  /// This method returns Primary Key List<PlaylistId,TrackId> [PlaylistTrack]
+  /// <returns>List<PlaylistId,TrackId>
   @override
   Future<List<PlaylistTrack>> toListPrimaryKey(
       [bool buildParams = true]) async {
     if (buildParams) {
       buildParameters();
     }
-    qparams.selectColumns = ['TrackId', 'PlaylistId'];
+    qparams.selectColumns = ['PlaylistId', 'TrackId'];
     final playlisttrackFuture = await _mnPlaylistTrack!.toList(qparams);
     return await PlaylistTrack.fromMapList(playlisttrackFuture);
   }
@@ -12909,16 +12911,16 @@ class PlaylistTrackFilterBuilder extends ConjunctionBase {
 
 // region PlaylistTrackFields
 class PlaylistTrackFields {
-  static TableField? _fTrackId;
-  static TableField get TrackId {
-    return _fTrackId =
-        _fTrackId ?? SqlSyntax.setField(_fTrackId, 'TrackId', DbType.integer);
-  }
-
   static TableField? _fPlaylistId;
   static TableField get PlaylistId {
     return _fPlaylistId = _fPlaylistId ??
         SqlSyntax.setField(_fPlaylistId, 'PlaylistId', DbType.integer);
+  }
+
+  static TableField? _fTrackId;
+  static TableField get TrackId {
+    return _fTrackId =
+        _fTrackId ?? SqlSyntax.setField(_fTrackId, 'TrackId', DbType.integer);
   }
 }
 // endregion PlaylistTrackFields
@@ -12931,8 +12933,8 @@ class PlaylistTrackManager extends SqfEntityProvider {
             primaryKeyList: _primaryKeyList,
             whereStr: _whereStr);
   static const String _tableName = 'PlaylistTrack';
-  static const List<String> _primaryKeyList = ['TrackId', 'PlaylistId'];
-  static const String _whereStr = 'TrackId=? AND PlaylistId=?';
+  static const List<String> _primaryKeyList = ['PlaylistId', 'TrackId'];
+  static const String _whereStr = 'PlaylistId=? AND TrackId=?';
 }
 
 //endregion PlaylistTrackManager
