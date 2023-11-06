@@ -72,14 +72,13 @@ const tableParkedBills = SqfEntityTable(
   modelName: 'ParkedBill',
   primaryKeyName: 'id',
   primaryKeyType: PrimaryKeyType.integer_auto_incremental,
-  useSoftDeleting: false,
   fields: [
     SqfEntityField('billId', DbType.text, isUnique: true),
     SqfEntityField('name', DbType.text, isUnique: true),
-    SqfEntityField('subtotal', DbType.numeric, defaultValue: 0),
-    SqfEntityField('tax', DbType.numeric, defaultValue: 0),
-    SqfEntityField('discount', DbType.numeric, defaultValue: 0),
-    SqfEntityField('netAmount', DbType.numeric, defaultValue: 0),
+    SqfEntityField('subtotal', DbType.real, defaultValue: 0),
+    SqfEntityField('tax', DbType.real, defaultValue: 0),
+    SqfEntityField('discount', DbType.real, defaultValue: 0),
+    SqfEntityField('netAmount', DbType.real, defaultValue: 0),
   ]
 );
 
@@ -88,7 +87,6 @@ const tableParkedBillItems = SqfEntityTable(
   modelName: 'ParkedBillItem',
   primaryKeyName: 'id',
   primaryKeyType: PrimaryKeyType.integer_auto_incremental,
-  useSoftDeleting: false,
   fields: [
     SqfEntityFieldRelationship(
       parentTable: tableParkedBills,
@@ -98,12 +96,13 @@ const tableParkedBillItems = SqfEntityTable(
     ),
     SqfEntityField('itemId', DbType.text, isUnique: true),
     SqfEntityField('pBillId', DbType.text),
+    SqfEntityField('name', DbType.text, isNotNull: true),
     SqfEntityField('image', DbType.text),
     SqfEntityField('quantity', DbType.numeric),
-    SqfEntityField('subtotal', DbType.numeric, defaultValue: 0),
-    SqfEntityField('tax', DbType.numeric, defaultValue: 0),
-    SqfEntityField('discount', DbType.numeric, defaultValue: 0),
-    SqfEntityField('netAmount', DbType.numeric, defaultValue: 0),
+    SqfEntityField('subtotal', DbType.real, defaultValue: 0),
+    SqfEntityField('tax', DbType.real, defaultValue: 0),
+    SqfEntityField('discount', DbType.real, defaultValue: 0),
+    SqfEntityField('netAmount', DbType.real, defaultValue: 0),
   ]
 );
 
@@ -112,7 +111,6 @@ const tableParkedBillItemTaxes = SqfEntityTable(
   modelName: 'ParkedBillItemTax',
   primaryKeyName: 'id',
   primaryKeyType: PrimaryKeyType.integer_auto_incremental,
-  useSoftDeleting: false,
   fields: [
     SqfEntityFieldRelationship(
       parentTable: tableParkedBillItems,
@@ -124,10 +122,74 @@ const tableParkedBillItemTaxes = SqfEntityTable(
     SqfEntityField('pItemId', DbType.text),
     SqfEntityField('name', DbType.text),
     SqfEntityField('taxMethod', DbType.text),
-    SqfEntityField('rate', DbType.numeric),
-    SqfEntityField('tax', DbType.numeric)
+    SqfEntityField('type', DbType.text),
+    SqfEntityField('rate', DbType.real),
+    SqfEntityField('tax', DbType.real)
   ]
 );
+
+const tableProductCategory = SqfEntityTable(
+    tableName: 'productCategories',
+    primaryKeyName: 'id',
+    primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+    modelName: 'ProductCategory',
+    fields: [
+      SqfEntityField('categoryId', DbType.text, isUnique: true),
+      SqfEntityField('name', DbType.text, isNotNull: true),
+      SqfEntityField('isActive', DbType.bool, defaultValue: true),
+    ]);
+
+const tableProductt = SqfEntityTable(
+    tableName: 'productt',
+    primaryKeyName: 'id',
+    primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+    modelName: 'Productt',
+    fields: [
+      SqfEntityField(
+        'name',
+        DbType.text,
+        isNotNull: true,
+      ),
+      SqfEntityField(
+        'productId',
+        DbType.text,
+        isUnique: true
+      ),
+      SqfEntityField('description', DbType.text),
+      SqfEntityField('price', DbType.real, defaultValue: 0),
+      SqfEntityField('isActive', DbType.bool, defaultValue: true),
+      SqfEntityFieldRelationship(
+          parentTable: tableProductCategory,
+          deleteRule: DeleteRule.CASCADE,
+          relationType: RelationType.MANY_TO_MANY,
+          manyToManyTableName: 'productCategoryLink',
+          isPrimaryKeyField: false
+      ),
+      SqfEntityField('imageUrl', DbType.text)
+    ]);
+
+const tableProductCategoryLink = SqfEntityTable(
+    tableName: 'productCategoryLink',
+    primaryKeyName: 'id',
+    primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+    useSoftDeleting: true,
+    modelName: 'ProductCategoryLink',
+    fields: [
+      SqfEntityFieldRelationship(
+          parentTable: tableProductCategory,
+          fieldName: 'pLocalCategoryId',
+          deleteRule: DeleteRule.CASCADE,
+          relationType: RelationType.ONE_TO_MANY,
+          isPrimaryKeyField: false
+      ),
+      SqfEntityFieldRelationship(
+          parentTable: tableProductt,
+          fieldName: 'pLocalProductId',
+          deleteRule: DeleteRule.CASCADE,
+          relationType: RelationType.ONE_TO_MANY,
+          isPrimaryKeyField: false
+      ),
+    ]);
 
 // Define the 'Todo' constant as SqfEntityTable.
 const tableTodo = SqfEntityTable(
@@ -164,11 +226,11 @@ const seqIdentity = SqfEntitySequence(
 @SqfEntityBuilder(myDbModel)
 const myDbModel = SqfEntityModel(
     modelName: 'MyDbModel',
-    databaseName: 'sampleORM_v2.1.2+38.db',
+    databaseName: 'sampleORM_v2.1.2+39.db',
     password:
         null, // You can set a password if you want to use crypted database (For more information: https://github.com/sqlcipher/sqlcipher)
     // put defined tables into the tables list.
-    databaseTables: [tableProduct, tableCategory, tableTodo, tableParkedBills, tableParkedBillItems, tableParkedBillItemTaxes],
+    databaseTables: [tableProduct, tableCategory, tableTodo, tableParkedBills, tableParkedBillItems, tableParkedBillItemTaxes, tableProductCategoryLink, tableProductCategory, tableProductt],
     // You can define tables to generate add/edit view forms if you want to use Form Generator property
     formTables: [tableProduct, tableCategory, tableTodo],
     // put defined sequences into the sequences list.

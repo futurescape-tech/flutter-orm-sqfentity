@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sqfentity/sqfentity.dart';
+import 'package:sqfentity_example/handlers/database_handler.dart';
 import 'package:sqfentity_gen/sqfentity_gen.dart';
 import 'app.dart';
 import 'model/chinook.dart';
@@ -42,51 +43,62 @@ void main(List<String> args) async {
 
 Future<bool> runSamples() async {
   // add some products
-  await addSomeProducts();
+  // await addSomeProducts();
+
+  // add some productts
+  // await addSomeProductts();
+
+  // await addSomeParkedBills();
 
   // Print all categories
-  printCategories(false);
+  // printCategories(false);
 
   // SELECT AND ORDER PRODUCTS BY FIELDS
-  await samples1();
+  // samples1();
 
   // FILTERS: SOME FILTERS ON PRODUCTS
-  await samples2();
+  // await samples2();
 
   // LIMITATIONS: PAGING, TOP X ROW
-  await samples3();
+  // await samples3();
 
   // DISTINCT, GROUP BY with SQL AGGREGATE FUNCTIONS,
-  await samples4();
+  // await samples4();
 
   // UPDATE BATCH, UPDATE OBJECT
-  await samples5();
+  // await samples5();
 
   // DELETE BATCH, DELETE OBJECT, RECOVERY
-  await samples6();
+  // await samples6();
 
   // ORM (Object Relational Mapping) SAMPLE
-  await samples7();
+  // await samples7();
 
   // fill List from the web (JSON)
-  await samples8();
+  // await samples8();
 
   // run custom sql query on database
-  await samples9();
+  // await samples9();
 
   // SEQUENCE samples
-  await samples10();
+  // await samples10();
 
   // toJson samples
-  await samples11();
+  // await samples11();
 
   // get data from view sample
-  await samples12();
+  // await samples12();
 
   // create model from existing database sample
   await createModelFromDatabaseSample();
 
-  await test1();
+  // await test1();
+  // await test2();
+  // await test3();
+  // await test6();
+  await test4();
+  // await test5();
+  // await test7();
 
   return true;
 }
@@ -888,6 +900,23 @@ Future<void> addSomeProducts() async {
   return;
 }
 
+/// add new categories if not any Category
+Future<void> addSomeProductts() async {
+  await addProductCategories();
+  // add new products if not any Product..
+  final product = await Productt().select().toSingle();
+  if (product == null) {
+    await addProductts();
+  } else {
+    debugPrint(
+        'There is already products in the database.. addProductts will not run');
+  }
+
+  await addProductCategoryLinks();
+
+  return;
+}
+
 Future<void> addCategories() async {
   final category = await Category().select().toSingle();
   if (category == null) {
@@ -896,6 +925,21 @@ Future<void> addCategories() async {
   } else {
     debugPrint(
         'There is already categories in the database.. addCategories will not run');
+  }
+}
+
+Future<void> addProductCategories() async {
+  final category = await ProductCategory().select().toSingle();
+  if (category == null) {
+    await ProductCategory(name: 'Notebooks', isActive: true).save();
+    await ProductCategory(name: 'Ultrabooks', isActive: true).save();
+    await ProductCategory(name: 'Macbooks', isActive: true).save();
+    await ProductCategory(name: 'Tabbooks', isActive: true).save();
+    await ProductCategory(name: 'Slimbooks', isActive: true).save();
+    await ProductCategory(name: 'Trimbooks', isActive: true).save();
+  } else {
+    debugPrint(
+        'There is already product categories in the database.. addProductCategories will not run');
   }
 }
 
@@ -1029,6 +1073,241 @@ Future<bool> addProducts() async {
   return true;
 }
 
+Future<bool> addProductts() async {
+  final productList = await Productt().select().toList();
+  if (productList.length < 15) {
+    // some dummy rows for select (id:1- to 15)
+    await Productt(
+      name: 'Notebook 12"',
+      description: '128 GB SSD i7',
+      price: 1234,
+    ).save();
+
+    await Productt(
+            name: 'Notebook 12"', description: '256 GB SSD i7', price: 5678)
+        .save();
+    await Productt(
+            name: 'Notebook 12"', description: '512 GB SSD i7', price: 1231)
+        .save();
+
+    await Productt(name: 'Notebook 13"', description: '128 GB SSD', price: 1344)
+        .save();
+    await Productt(name: 'Notebook 13"', description: '256 GB SSD', price: 2357)
+        .save();
+    await Productt(name: 'Notebook 13"', description: '512 GB SSD', price: 1549)
+        .save();
+
+    await Productt(name: 'Notebook 15"', description: '128 GB SSD', price: 3422)
+        .save();
+    await Productt(name: 'Notebook 15"', description: '256 GB SSD', price: 6756)
+        .save();
+    await Productt(name: 'Notebook 15"', description: '512 GB SSD', price: 5656)
+        .save();
+
+    await Productt(
+            name: 'Ultrabook 13"', description: '128 GB SSD i5', price: 7865)
+        .save();
+    await Productt(
+            name: 'Ultrabook 13"', description: '256 GB SSD i5', price: 4556)
+        .save();
+    await Productt(
+            name: 'Ultrabook 13"', description: '512 GB SSD i5', price: 5445)
+        .save();
+
+    await Productt(
+            name: 'Ultrabook 15"', description: '128 GB SSD i7', price: 7563)
+        .save();
+    await Productt(
+            name: 'Ultrabook 15"', description: '256 GB SSD i7', price: 5345)
+        .save();
+    await Productt(
+            name: 'Ultrabook 15"', description: '512 GB SSD i7', price: 2133)
+        .save();
+    debugPrint('added 15 new products');
+
+    // add a few dummy products for delete (id:from 16 to 20)
+    await Productt(name: 'Product 1').save();
+    await Productt(name: 'Product 2').save();
+    await Productt(name: 'Product 3').save();
+    await Productt(name: 'Product 4').save();
+    await Productt(name: 'Product 5').save();
+    debugPrint('added 5 dummy products');
+  }
+  return true;
+}
+
+Future<void> addProductCategoryLinks() async {
+  final link = await ProductCategoryLink().select().toSingle();
+  if (link == null) {
+    await ProductCategoryLink(pLocalCategoryId: 1, pLocalProductId: 1).save();
+    await ProductCategoryLink(pLocalCategoryId: 1, pLocalProductId: 2).save();
+    await ProductCategoryLink(pLocalCategoryId: 1, pLocalProductId: 3).save();
+    await ProductCategoryLink(pLocalCategoryId: 1, pLocalProductId: 4).save();
+    await ProductCategoryLink(pLocalCategoryId: 1, pLocalProductId: 5).save();
+    await ProductCategoryLink(pLocalCategoryId: 1, pLocalProductId: 6).save();
+
+    await ProductCategoryLink(pLocalCategoryId: 2, pLocalProductId: 1).save();
+    await ProductCategoryLink(pLocalCategoryId: 2, pLocalProductId: 2).save();
+    await ProductCategoryLink(pLocalCategoryId: 2, pLocalProductId: 3).save();
+    await ProductCategoryLink(pLocalCategoryId: 2, pLocalProductId: 4).save();
+
+    await ProductCategoryLink(pLocalCategoryId: 3, pLocalProductId: 5).save();
+    await ProductCategoryLink(pLocalCategoryId: 3, pLocalProductId: 6).save();
+    await ProductCategoryLink(pLocalCategoryId: 3, pLocalProductId: 7).save();
+    await ProductCategoryLink(pLocalCategoryId: 3, pLocalProductId: 8).save();
+    await ProductCategoryLink(pLocalCategoryId: 3, pLocalProductId: 9).save();
+    await ProductCategoryLink(pLocalCategoryId: 3, pLocalProductId: 10).save();
+
+    await ProductCategoryLink(pLocalCategoryId: 4, pLocalProductId: 11).save();
+    await ProductCategoryLink(pLocalCategoryId: 4, pLocalProductId: 12).save();
+    await ProductCategoryLink(pLocalCategoryId: 4, pLocalProductId: 13).save();
+    await ProductCategoryLink(pLocalCategoryId: 4, pLocalProductId: 14).save();
+    await ProductCategoryLink(pLocalCategoryId: 4, pLocalProductId: 15).save();
+  } else {
+    debugPrint(
+        'There is already product category links in the database.. addProductCategoryLinks will not run');
+  }
+}
+
+Future<void> addSomeParkedBills() async {
+  await addParkedBills();
+  await addParkedBillItems();
+  await addParkedBillItemTaxes();
+}
+
+Future<void> addParkedBills() async {
+  final parkedBill = await ParkedBill().select().toSingle();
+  if (parkedBill == null) {
+    await ParkedBill(name: 'Bill 1A', subtotal: 150, tax: 20, netAmount: 170)
+        .save();
+    await ParkedBill(name: 'Bill 1B', subtotal: 100, tax: 30, netAmount: 130)
+        .save();
+    await ParkedBill(name: 'Bill 2A', subtotal: 500, tax: 50, netAmount: 550)
+        .save();
+    await ParkedBill(name: 'Bill 2B', subtotal: 1010, tax: 40, netAmount: 1050)
+        .save();
+  }
+}
+
+Future<void> addParkedBillItems() async {
+  final items = await ParkedBillItem().select().toSingle();
+  if (items == null) {
+    await ParkedBillItem(
+            pLocalBillId: 1,
+            name: 'Veg Fired Rice',
+            quantity: 2,
+            subtotal: 50,
+            tax: 10,
+            netAmount: 60)
+        .save();
+    await ParkedBillItem(
+            pLocalBillId: 1,
+            name: 'Veg Schezwan Fried Rice',
+            quantity: 1,
+            subtotal: 40,
+            tax: 9,
+            netAmount: 49)
+        .save();
+    await ParkedBillItem(
+            pLocalBillId: 1,
+            name: 'Jeera Rice',
+            quantity: 3,
+            subtotal: 60,
+            tax: 10,
+            netAmount: 70)
+        .save();
+
+    await ParkedBillItem(
+            pLocalBillId: 2,
+            name: 'Dal Tadka',
+            quantity: 5,
+            subtotal: 100,
+            tax: 50,
+            netAmount: 150)
+        .save();
+    await ParkedBillItem(
+            pLocalBillId: 2,
+            name: 'Veg Biryani',
+            quantity: 6,
+            subtotal: 90,
+            tax: 9,
+            netAmount: 99)
+        .save();
+
+    await ParkedBillItem(
+            pLocalBillId: 3,
+            name: 'Paneer Tikka Masala',
+            quantity: 3,
+            subtotal: 55,
+            tax: 5,
+            netAmount: 60)
+        .save();
+    await ParkedBillItem(
+            pLocalBillId: 3,
+            name: 'Mix Veg',
+            quantity: 1,
+            subtotal: 75,
+            tax: 21,
+            netAmount: 96)
+        .save();
+  }
+}
+
+Future<void> addParkedBillItemTaxes() async {
+  final itemTaxes = await ParkedBillItemTax().select().toSingle();
+  if (itemTaxes == null) {
+    await ParkedBillItemTax(
+            pLocalItemId: 1,
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 10)
+        .save();
+    await ParkedBillItemTax(
+            pLocalItemId: 2,
+            name: 'GST 5',
+            taxMethod: 'exclusive',
+            rate: 5,
+            tax: 9)
+        .save();
+    await ParkedBillItemTax(
+            pLocalItemId: 3,
+            name: 'GST 18',
+            taxMethod: 'exclusive',
+            rate: 18,
+            tax: 10)
+        .save();
+    await ParkedBillItemTax(
+            pLocalItemId: 4,
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 50)
+        .save();
+    await ParkedBillItemTax(
+            pLocalItemId: 5,
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 9)
+        .save();
+    await ParkedBillItemTax(
+            pLocalItemId: 6,
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 5)
+        .save();
+    await ParkedBillItemTax(
+            pLocalItemId: 7,
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 21)
+        .save();
+  }
+}
+
 Future<void> test1() async {
   final product = await Product()
       .select(columnsToSelect: [])
@@ -1042,7 +1321,7 @@ Future<void> test1() async {
       .equals(true)
       .endBlock
       .toSingle();
-  
+
   print('KLM Product = ${product?.toMap()}');
   print('KLM Product Type = ${product.runtimeType}');
 
@@ -1050,4 +1329,178 @@ Future<void> test1() async {
 
   print('KLM Category = ${category?.toMap()}');
   print('KLM Category Type = ${category.runtimeType}');
+}
+
+Future<void> test2() async {
+  print('ABC');
+
+  final category = await ProductCategory(id: 1).select().toSingle();
+
+  print('ABC category = $category');
+
+  final products1 = await category?.getProductts()?.page(1, 3).toMapList();
+  print('ABC products1 = $products1');
+
+  final products2 = await category?.getProductts()?.page(2, 3).toMapList();
+  print('ABC products2 = $products2');
+
+  final products3 = await category?.getProductts()?.page(3, 3).toMapList();
+  print('ABC products3 = $products3');
+}
+
+Future<void> test3() async {
+  final parkedBills = await ParkedBill().select().toList(
+      preload: true,
+      preloadFields: ['plParkedBillItems', 'plParkedBillItemTaxs']);
+
+  print('ParkedBills = $parkedBills');
+}
+
+Future<void> test4() async {
+  try {
+    await DatabaseHandler.instance.database.batchStart();
+
+    int? localBillId = await ParkedBill(name: 'Bill 3A', subtotal: 660, tax: 150, netAmount: 810)
+        .save(ignoreBatch: true);
+
+    if (localBillId == null) {
+      DatabaseHandler.instance.database.batchRollback();
+      return;
+    }
+
+    int? localItemId = await ParkedBillItem(
+            pLocalBillId: localBillId,
+            name: 'Veg Noodles',
+            quantity: 1,
+            subtotal: 240,
+            tax: 50,
+            netAmount: 290)
+        .save(ignoreBatch: true);
+
+    if (localItemId == null) {
+      DatabaseHandler.instance.database.batchRollback();
+      return;
+    }
+
+    final itemTaxes = <ParkedBillItemTax>[
+      ParkedBillItemTax(
+            pLocalItemId: localItemId,
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 15),
+      ParkedBillItemTax(
+            pLocalItemId: localItemId,
+            name: 'GST 5',
+            taxMethod: 'exclusive',
+            rate: 5,
+            tax: 15),
+      ParkedBillItemTax(
+            pLocalItemId: localItemId,
+            name: 'GST 18',
+            taxMethod: 'exclusive',
+            rate: 18,
+            tax: 20)
+    ];
+
+    final localItemTaxIds = <int>[];
+    int i = 0;
+    for (var itemTax in itemTaxes) {
+      localItemTaxIds.add((await itemTax.save(ignoreBatch: true)) ?? -1);
+      if (i == 2) {
+        throw Exception('A Test Error !!!');
+      }
+      i++;
+    } 
+
+    if (localItemTaxIds.length != itemTaxes.length && localItemTaxIds.contains(-1)) {
+      DatabaseHandler.instance.database.batchRollback();
+      return;
+    }
+        
+    var result = await DatabaseHandler.instance.database.batchCommit();
+  } catch (e) {
+    print('ERROR: ${e.toString()}');
+    DatabaseHandler.instance.database.batchRollback();
+  }
+}
+
+Future<void> test6() async {
+  try {
+    await DatabaseHandler.instance.database.batchStart();
+
+    int? localBillId = await ParkedBill(name: 'Bill 3B', subtotal: 760, tax: 170, netAmount: 930)
+        .save(ignoreBatch: false);
+
+    if (localBillId == null) {
+      DatabaseHandler.instance.database.batchRollback();
+      return;
+    }
+        
+    await DatabaseHandler.instance.database.batchCommit();
+  } catch (e) {
+    print('ERROR: ${e.toString()}');
+    DatabaseHandler.instance.database.batchRollback();
+  }
+}
+
+Future<void> test5() async {
+  try {
+    await DatabaseHandler.instance.database.batchStart();
+
+    final int localBillId = 5;
+    final result = await ParkedBill(id: localBillId).delete();
+    if (result.success) {
+      print('ParkedBill with local bill id = $localBillId deleted successfully');
+    } else {
+      print('Failed to delete ParkedBill with local bill id = $localBillId');
+    }
+
+    await DatabaseHandler.instance.database.batchCommit();
+  } catch (e) {
+    print('ERROR: ${e.toString()}');
+    DatabaseHandler.instance.database.batchRollback();
+  }
+}
+
+Future<void> test7() async {
+  try {
+    await DatabaseHandler.instance.database.batchStart();
+
+    final itemTaxes = <ParkedBillItemTax>[
+      ParkedBillItemTax(
+            name: 'GST 12',
+            taxMethod: 'exclusive',
+            rate: 12,
+            tax: 15),
+      ParkedBillItemTax(
+            name: 'GST 5',
+            taxMethod: 'exclusive',
+            rate: 5,
+            tax: 15),
+      ParkedBillItemTax(
+            name: 'GST 18',
+            taxMethod: 'exclusive',
+            rate: 18,
+            tax: 20)
+    ];
+
+    final item =  ParkedBillItem(
+            name: 'Veg Noodles',
+            quantity: 1,
+            subtotal: 240,
+            tax: 50,
+            netAmount: 290)
+            ..plParkedBillItemTaxs = itemTaxes;
+    
+    final bill = ParkedBill(name: 'Bill 3A', subtotal: 660, tax: 150, netAmount: 810)
+    ..plParkedBillItems = [item];
+
+    await bill.save(ignoreBatch: false);
+        
+    await DatabaseHandler.instance.database.batchCommit();
+  } catch (e) {
+    print('ERROR: ${e.toString()}');
+    DatabaseHandler.instance.database.batchRollback();
+  }
 }

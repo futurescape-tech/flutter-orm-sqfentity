@@ -128,10 +128,10 @@ class TableParkedBill extends SqfEntityTableBase {
     fields = [
       SqfEntityFieldBase('billId', DbType.text, isUnique: true),
       SqfEntityFieldBase('name', DbType.text, isUnique: true),
-      SqfEntityFieldBase('subtotal', DbType.numeric, defaultValue: 0),
-      SqfEntityFieldBase('tax', DbType.numeric, defaultValue: 0),
-      SqfEntityFieldBase('discount', DbType.numeric, defaultValue: 0),
-      SqfEntityFieldBase('netAmount', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('subtotal', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('tax', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('discount', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('netAmount', DbType.real, defaultValue: 0),
       SqfEntityFieldBase('dateCreated', DbType.datetime,
           defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
     ];
@@ -160,12 +160,13 @@ class TableParkedBillItem extends SqfEntityTableBase {
           relationType: RelationType.ONE_TO_MANY, fieldName: 'pLocalBillId'),
       SqfEntityFieldBase('itemId', DbType.text, isUnique: true),
       SqfEntityFieldBase('pBillId', DbType.text),
+      SqfEntityFieldBase('name', DbType.text, isNotNull: true),
       SqfEntityFieldBase('image', DbType.text),
       SqfEntityFieldBase('quantity', DbType.numeric),
-      SqfEntityFieldBase('subtotal', DbType.numeric, defaultValue: 0),
-      SqfEntityFieldBase('tax', DbType.numeric, defaultValue: 0),
-      SqfEntityFieldBase('discount', DbType.numeric, defaultValue: 0),
-      SqfEntityFieldBase('netAmount', DbType.numeric, defaultValue: 0),
+      SqfEntityFieldBase('subtotal', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('tax', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('discount', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('netAmount', DbType.real, defaultValue: 0),
       SqfEntityFieldBase('dateCreated', DbType.datetime,
           defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
     ];
@@ -196,8 +197,9 @@ class TableParkedBillItemTax extends SqfEntityTableBase {
       SqfEntityFieldBase('pItemId', DbType.text),
       SqfEntityFieldBase('name', DbType.text),
       SqfEntityFieldBase('taxMethod', DbType.text),
-      SqfEntityFieldBase('rate', DbType.numeric),
-      SqfEntityFieldBase('tax', DbType.numeric),
+      SqfEntityFieldBase('type', DbType.text),
+      SqfEntityFieldBase('rate', DbType.real),
+      SqfEntityFieldBase('tax', DbType.real),
       SqfEntityFieldBase('dateCreated', DbType.datetime,
           defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
     ];
@@ -206,6 +208,91 @@ class TableParkedBillItemTax extends SqfEntityTableBase {
   static SqfEntityTableBase? _instance;
   static SqfEntityTableBase get getInstance {
     return _instance = _instance ?? TableParkedBillItemTax();
+  }
+}
+
+// ProductCategoryLink TABLE
+class TableProductCategoryLink extends SqfEntityTableBase {
+  TableProductCategoryLink() {
+    // declare properties of EntityTable
+    tableName = 'productCategoryLink';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = true;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldRelationshipBase(
+          TableProductCategory.getInstance, DeleteRule.CASCADE,
+          relationType: RelationType.ONE_TO_MANY,
+          fieldName: 'pLocalCategoryId'),
+      SqfEntityFieldRelationshipBase(
+          TableProductt.getInstance, DeleteRule.CASCADE,
+          relationType: RelationType.ONE_TO_MANY, fieldName: 'pLocalProductId'),
+      SqfEntityFieldBase('dateCreated', DbType.datetime,
+          defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableProductCategoryLink();
+  }
+}
+
+// ProductCategory TABLE
+class TableProductCategory extends SqfEntityTableBase {
+  TableProductCategory() {
+    // declare properties of EntityTable
+    tableName = 'productCategories';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = false;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldBase('categoryId', DbType.text, isUnique: true),
+      SqfEntityFieldBase('name', DbType.text, isNotNull: true),
+      SqfEntityFieldBase('isActive', DbType.bool, defaultValue: true),
+      SqfEntityFieldBase('dateCreated', DbType.datetime,
+          defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableProductCategory();
+  }
+}
+
+// Productt TABLE
+class TableProductt extends SqfEntityTableBase {
+  TableProductt() {
+    // declare properties of EntityTable
+    tableName = 'productt';
+    primaryKeyName = 'id';
+    primaryKeyType = PrimaryKeyType.integer_auto_incremental;
+    useSoftDeleting = false;
+    // when useSoftDeleting is true, creates a field named 'isDeleted' on the table, and set to '1' this field when item deleted (does not hard delete)
+
+    // declare fields
+    fields = [
+      SqfEntityFieldBase('name', DbType.text, isNotNull: true),
+      SqfEntityFieldBase('productId', DbType.text, isUnique: true),
+      SqfEntityFieldBase('description', DbType.text),
+      SqfEntityFieldBase('price', DbType.real, defaultValue: 0),
+      SqfEntityFieldBase('isActive', DbType.bool, defaultValue: true),
+      SqfEntityFieldBase('imageUrl', DbType.text),
+      SqfEntityFieldBase('dateCreated', DbType.datetime,
+          defaultValue: DateTime.now(), minValue: DateTime.parse('1900-01-01')),
+    ];
+    super.init();
+  }
+  static SqfEntityTableBase? _instance;
+  static SqfEntityTableBase get getInstance {
+    return _instance = _instance ?? TableProductt();
   }
 }
 // END TABLES
@@ -245,6 +332,9 @@ class MyDbModel extends SqfEntityModelProvider {
       TableParkedBill.getInstance,
       TableParkedBillItem.getInstance,
       TableParkedBillItemTax.getInstance,
+      TableProductCategoryLink.getInstance,
+      TableProductCategory.getInstance,
+      TableProductt.getInstance,
     ];
 
     sequences = [
@@ -3468,16 +3558,16 @@ class ParkedBill extends TableBase {
       name = o['name'].toString();
     }
     if (o['subtotal'] != null) {
-      subtotal = int.tryParse(o['subtotal'].toString());
+      subtotal = double.tryParse(o['subtotal'].toString());
     }
     if (o['tax'] != null) {
-      tax = int.tryParse(o['tax'].toString());
+      tax = double.tryParse(o['tax'].toString());
     }
     if (o['discount'] != null) {
-      discount = int.tryParse(o['discount'].toString());
+      discount = double.tryParse(o['discount'].toString());
     }
     if (o['netAmount'] != null) {
-      netAmount = int.tryParse(o['netAmount'].toString());
+      netAmount = double.tryParse(o['netAmount'].toString());
     }
     if (o['dateCreated'] != null) {
       dateCreated = int.tryParse(o['dateCreated'].toString()) != null
@@ -3490,15 +3580,15 @@ class ParkedBill extends TableBase {
   int? id;
   String? billId;
   String? name;
-  int? subtotal;
-  int? tax;
-  int? discount;
-  int? netAmount;
+  double? subtotal;
+  double? tax;
+  double? discount;
+  double? netAmount;
   DateTime? dateCreated;
 
   // end FIELDS (ParkedBill)
 
-  // COLLECTIONS & VIRTUALS (ParkedBill)
+// COLLECTIONS & VIRTUALS (ParkedBill)
   /// to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
   /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plParkedBillItems', 'plField2'..]) or so on..
   List<ParkedBillItem>? plParkedBillItems;
@@ -3516,7 +3606,7 @@ class ParkedBill extends TableBase {
         .and;
   }
 
-  // END COLLECTIONS & VIRTUALS (ParkedBill)
+// END COLLECTIONS & VIRTUALS (ParkedBill)
 
   static const bool _softDeleteActivated = false;
   ParkedBillManager? __mnParkedBill;
@@ -3597,11 +3687,11 @@ class ParkedBill extends TableBase {
       map['dateCreated'] = null;
     }
 
-  // COLLECTIONS (ParkedBill)
+// COLLECTIONS (ParkedBill)
     if (!forQuery) {
       map['ParkedBillItems'] = await getParkedBillItems()!.toMapList();
     }
-  // END COLLECTIONS (ParkedBill)
+// END COLLECTIONS (ParkedBill)
 
     return map;
   }
@@ -4150,22 +4240,22 @@ class ParkedBillFilterBuilder extends ConjunctionBase {
 
   ParkedBillField? _subtotal;
   ParkedBillField get subtotal {
-    return _subtotal = _setField(_subtotal, 'subtotal', DbType.numeric);
+    return _subtotal = _setField(_subtotal, 'subtotal', DbType.real);
   }
 
   ParkedBillField? _tax;
   ParkedBillField get tax {
-    return _tax = _setField(_tax, 'tax', DbType.numeric);
+    return _tax = _setField(_tax, 'tax', DbType.real);
   }
 
   ParkedBillField? _discount;
   ParkedBillField get discount {
-    return _discount = _setField(_discount, 'discount', DbType.numeric);
+    return _discount = _setField(_discount, 'discount', DbType.real);
   }
 
   ParkedBillField? _netAmount;
   ParkedBillField get netAmount {
-    return _netAmount = _setField(_netAmount, 'netAmount', DbType.numeric);
+    return _netAmount = _setField(_netAmount, 'netAmount', DbType.real);
   }
 
   ParkedBillField? _dateCreated;
@@ -4438,25 +4528,25 @@ class ParkedBillFields {
 
   static TableField? _fSubtotal;
   static TableField get subtotal {
-    return _fSubtotal = _fSubtotal ??
-        SqlSyntax.setField(_fSubtotal, 'subtotal', DbType.numeric);
+    return _fSubtotal =
+        _fSubtotal ?? SqlSyntax.setField(_fSubtotal, 'subtotal', DbType.real);
   }
 
   static TableField? _fTax;
   static TableField get tax {
-    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.numeric);
+    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.real);
   }
 
   static TableField? _fDiscount;
   static TableField get discount {
-    return _fDiscount = _fDiscount ??
-        SqlSyntax.setField(_fDiscount, 'discount', DbType.numeric);
+    return _fDiscount =
+        _fDiscount ?? SqlSyntax.setField(_fDiscount, 'discount', DbType.real);
   }
 
   static TableField? _fNetAmount;
   static TableField get netAmount {
     return _fNetAmount = _fNetAmount ??
-        SqlSyntax.setField(_fNetAmount, 'netAmount', DbType.numeric);
+        SqlSyntax.setField(_fNetAmount, 'netAmount', DbType.real);
   }
 
   static TableField? _fDateCreated;
@@ -4487,6 +4577,7 @@ class ParkedBillItem extends TableBase {
       this.pLocalBillId,
       this.itemId,
       this.pBillId,
+      this.name,
       this.image,
       this.quantity,
       this.subtotal,
@@ -4501,6 +4592,7 @@ class ParkedBillItem extends TableBase {
       this.pLocalBillId,
       this.itemId,
       this.pBillId,
+      this.name,
       this.image,
       this.quantity,
       this.subtotal,
@@ -4515,6 +4607,7 @@ class ParkedBillItem extends TableBase {
       this.pLocalBillId,
       this.itemId,
       this.pBillId,
+      this.name,
       this.image,
       this.quantity,
       this.subtotal,
@@ -4539,6 +4632,9 @@ class ParkedBillItem extends TableBase {
     if (o['pBillId'] != null) {
       pBillId = o['pBillId'].toString();
     }
+    if (o['name'] != null) {
+      name = o['name'].toString();
+    }
     if (o['image'] != null) {
       image = o['image'].toString();
     }
@@ -4546,16 +4642,16 @@ class ParkedBillItem extends TableBase {
       quantity = int.tryParse(o['quantity'].toString());
     }
     if (o['subtotal'] != null) {
-      subtotal = int.tryParse(o['subtotal'].toString());
+      subtotal = double.tryParse(o['subtotal'].toString());
     }
     if (o['tax'] != null) {
-      tax = int.tryParse(o['tax'].toString());
+      tax = double.tryParse(o['tax'].toString());
     }
     if (o['discount'] != null) {
-      discount = int.tryParse(o['discount'].toString());
+      discount = double.tryParse(o['discount'].toString());
     }
     if (o['netAmount'] != null) {
-      netAmount = int.tryParse(o['netAmount'].toString());
+      netAmount = double.tryParse(o['netAmount'].toString());
     }
     if (o['dateCreated'] != null) {
       dateCreated = int.tryParse(o['dateCreated'].toString()) != null
@@ -4575,12 +4671,13 @@ class ParkedBillItem extends TableBase {
   int? pLocalBillId;
   String? itemId;
   String? pBillId;
+  String? name;
   String? image;
   int? quantity;
-  int? subtotal;
-  int? tax;
-  int? discount;
-  int? netAmount;
+  double? subtotal;
+  double? tax;
+  double? discount;
+  double? netAmount;
   DateTime? dateCreated;
 
   // end FIELDS (ParkedBillItem)
@@ -4647,6 +4744,9 @@ class ParkedBillItem extends TableBase {
     if (pBillId != null || !forView) {
       map['pBillId'] = pBillId;
     }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
     if (image != null || !forView) {
       map['image'] = image;
     }
@@ -4699,6 +4799,9 @@ class ParkedBillItem extends TableBase {
     }
     if (pBillId != null || !forView) {
       map['pBillId'] = pBillId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
     }
     if (image != null || !forView) {
       map['image'] = image;
@@ -4755,6 +4858,7 @@ class ParkedBillItem extends TableBase {
       pLocalBillId,
       itemId,
       pBillId,
+      name,
       image,
       quantity,
       subtotal,
@@ -4772,6 +4876,7 @@ class ParkedBillItem extends TableBase {
       pLocalBillId,
       itemId,
       pBillId,
+      name,
       image,
       quantity,
       subtotal,
@@ -4983,12 +5088,13 @@ class ParkedBillItem extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnParkedBillItem.rawInsert(
-          'INSERT OR REPLACE INTO parkedBillItems (id, pLocalBillId, itemId, pBillId, image, quantity, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          'INSERT OR REPLACE INTO parkedBillItems (id, pLocalBillId, itemId, pBillId, name, image, quantity, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
           [
             id,
             pLocalBillId,
             itemId,
             pBillId,
+            name,
             image,
             quantity,
             subtotal,
@@ -5023,7 +5129,7 @@ class ParkedBillItem extends TableBase {
   Future<BoolCommitResult> upsertAll(List<ParkedBillItem> parkedbillitems,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnParkedBillItem.rawInsertAll(
-        'INSERT OR REPLACE INTO parkedBillItems (id, pLocalBillId, itemId, pBillId, image, quantity, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+        'INSERT OR REPLACE INTO parkedBillItems (id, pLocalBillId, itemId, pBillId, name, image, quantity, subtotal, tax, discount, netAmount, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
         parkedbillitems,
         exclusive: exclusive,
         noResult: noResult,
@@ -5318,6 +5424,11 @@ class ParkedBillItemFilterBuilder extends ConjunctionBase {
     return _pBillId = _setField(_pBillId, 'pBillId', DbType.text);
   }
 
+  ParkedBillItemField? _name;
+  ParkedBillItemField get name {
+    return _name = _setField(_name, 'name', DbType.text);
+  }
+
   ParkedBillItemField? _image;
   ParkedBillItemField get image {
     return _image = _setField(_image, 'image', DbType.text);
@@ -5330,22 +5441,22 @@ class ParkedBillItemFilterBuilder extends ConjunctionBase {
 
   ParkedBillItemField? _subtotal;
   ParkedBillItemField get subtotal {
-    return _subtotal = _setField(_subtotal, 'subtotal', DbType.numeric);
+    return _subtotal = _setField(_subtotal, 'subtotal', DbType.real);
   }
 
   ParkedBillItemField? _tax;
   ParkedBillItemField get tax {
-    return _tax = _setField(_tax, 'tax', DbType.numeric);
+    return _tax = _setField(_tax, 'tax', DbType.real);
   }
 
   ParkedBillItemField? _discount;
   ParkedBillItemField get discount {
-    return _discount = _setField(_discount, 'discount', DbType.numeric);
+    return _discount = _setField(_discount, 'discount', DbType.real);
   }
 
   ParkedBillItemField? _netAmount;
   ParkedBillItemField get netAmount {
-    return _netAmount = _setField(_netAmount, 'netAmount', DbType.numeric);
+    return _netAmount = _setField(_netAmount, 'netAmount', DbType.real);
   }
 
   ParkedBillItemField? _dateCreated;
@@ -5637,6 +5748,11 @@ class ParkedBillItemFields {
         _fPBillId ?? SqlSyntax.setField(_fPBillId, 'pBillId', DbType.text);
   }
 
+  static TableField? _fName;
+  static TableField get name {
+    return _fName = _fName ?? SqlSyntax.setField(_fName, 'name', DbType.text);
+  }
+
   static TableField? _fImage;
   static TableField get image {
     return _fImage =
@@ -5651,25 +5767,25 @@ class ParkedBillItemFields {
 
   static TableField? _fSubtotal;
   static TableField get subtotal {
-    return _fSubtotal = _fSubtotal ??
-        SqlSyntax.setField(_fSubtotal, 'subtotal', DbType.numeric);
+    return _fSubtotal =
+        _fSubtotal ?? SqlSyntax.setField(_fSubtotal, 'subtotal', DbType.real);
   }
 
   static TableField? _fTax;
   static TableField get tax {
-    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.numeric);
+    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.real);
   }
 
   static TableField? _fDiscount;
   static TableField get discount {
-    return _fDiscount = _fDiscount ??
-        SqlSyntax.setField(_fDiscount, 'discount', DbType.numeric);
+    return _fDiscount =
+        _fDiscount ?? SqlSyntax.setField(_fDiscount, 'discount', DbType.real);
   }
 
   static TableField? _fNetAmount;
   static TableField get netAmount {
     return _fNetAmount = _fNetAmount ??
-        SqlSyntax.setField(_fNetAmount, 'netAmount', DbType.numeric);
+        SqlSyntax.setField(_fNetAmount, 'netAmount', DbType.real);
   }
 
   static TableField? _fDateCreated;
@@ -5702,18 +5818,36 @@ class ParkedBillItemTax extends TableBase {
       this.pItemId,
       this.name,
       this.taxMethod,
+      this.type,
       this.rate,
       this.tax,
       this.dateCreated}) {
     _setDefaultValues();
     softDeleteActivated = false;
   }
-  ParkedBillItemTax.withFields(this.pLocalItemId, this.taxId, this.pItemId,
-      this.name, this.taxMethod, this.rate, this.tax, this.dateCreated) {
+  ParkedBillItemTax.withFields(
+      this.pLocalItemId,
+      this.taxId,
+      this.pItemId,
+      this.name,
+      this.taxMethod,
+      this.type,
+      this.rate,
+      this.tax,
+      this.dateCreated) {
     _setDefaultValues();
   }
-  ParkedBillItemTax.withId(this.id, this.pLocalItemId, this.taxId, this.pItemId,
-      this.name, this.taxMethod, this.rate, this.tax, this.dateCreated) {
+  ParkedBillItemTax.withId(
+      this.id,
+      this.pLocalItemId,
+      this.taxId,
+      this.pItemId,
+      this.name,
+      this.taxMethod,
+      this.type,
+      this.rate,
+      this.tax,
+      this.dateCreated) {
     _setDefaultValues();
   }
   // fromMap v2.0
@@ -5737,11 +5871,14 @@ class ParkedBillItemTax extends TableBase {
     if (o['taxMethod'] != null) {
       taxMethod = o['taxMethod'].toString();
     }
+    if (o['type'] != null) {
+      type = o['type'].toString();
+    }
     if (o['rate'] != null) {
-      rate = int.tryParse(o['rate'].toString());
+      rate = double.tryParse(o['rate'].toString());
     }
     if (o['tax'] != null) {
-      tax = int.tryParse(o['tax'].toString());
+      tax = double.tryParse(o['tax'].toString());
     }
     if (o['dateCreated'] != null) {
       dateCreated = int.tryParse(o['dateCreated'].toString()) != null
@@ -5763,8 +5900,9 @@ class ParkedBillItemTax extends TableBase {
   String? pItemId;
   String? name;
   String? taxMethod;
-  int? rate;
-  int? tax;
+  String? type;
+  double? rate;
+  double? tax;
   DateTime? dateCreated;
 
   // end FIELDS (ParkedBillItemTax)
@@ -5818,6 +5956,9 @@ class ParkedBillItemTax extends TableBase {
     if (taxMethod != null || !forView) {
       map['taxMethod'] = taxMethod;
     }
+    if (type != null || !forView) {
+      map['type'] = type;
+    }
     if (rate != null || !forView) {
       map['rate'] = rate;
     }
@@ -5865,6 +6006,9 @@ class ParkedBillItemTax extends TableBase {
     if (taxMethod != null || !forView) {
       map['taxMethod'] = taxMethod;
     }
+    if (type != null || !forView) {
+      map['type'] = type;
+    }
     if (rate != null || !forView) {
       map['rate'] = rate;
     }
@@ -5904,6 +6048,7 @@ class ParkedBillItemTax extends TableBase {
       pItemId,
       name,
       taxMethod,
+      type,
       rate,
       tax,
       dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
@@ -5919,6 +6064,7 @@ class ParkedBillItemTax extends TableBase {
       pItemId,
       name,
       taxMethod,
+      type,
       rate,
       tax,
       dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
@@ -6097,7 +6243,7 @@ class ParkedBillItemTax extends TableBase {
   Future<int?> upsert({bool ignoreBatch = true}) async {
     try {
       final result = await _mnParkedBillItemTax.rawInsert(
-          'INSERT OR REPLACE INTO parkedBillItemTaxes (id, pLocalItemId, taxId, pItemId, name, taxMethod, rate, tax, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?)',
+          'INSERT OR REPLACE INTO parkedBillItemTaxes (id, pLocalItemId, taxId, pItemId, name, taxMethod, type, rate, tax, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?)',
           [
             id,
             pLocalItemId,
@@ -6105,6 +6251,7 @@ class ParkedBillItemTax extends TableBase {
             pItemId,
             name,
             taxMethod,
+            type,
             rate,
             tax,
             dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
@@ -6136,7 +6283,7 @@ class ParkedBillItemTax extends TableBase {
   Future<BoolCommitResult> upsertAll(List<ParkedBillItemTax> parkedbillitemtaxs,
       {bool? exclusive, bool? noResult, bool? continueOnError}) async {
     final results = await _mnParkedBillItemTax.rawInsertAll(
-        'INSERT OR REPLACE INTO parkedBillItemTaxes (id, pLocalItemId, taxId, pItemId, name, taxMethod, rate, tax, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?)',
+        'INSERT OR REPLACE INTO parkedBillItemTaxes (id, pLocalItemId, taxId, pItemId, name, taxMethod, type, rate, tax, dateCreated)  VALUES (?,?,?,?,?,?,?,?,?,?)',
         parkedbillitemtaxs,
         exclusive: exclusive,
         noResult: noResult,
@@ -6425,14 +6572,19 @@ class ParkedBillItemTaxFilterBuilder extends ConjunctionBase {
     return _taxMethod = _setField(_taxMethod, 'taxMethod', DbType.text);
   }
 
+  ParkedBillItemTaxField? _type;
+  ParkedBillItemTaxField get type {
+    return _type = _setField(_type, 'type', DbType.text);
+  }
+
   ParkedBillItemTaxField? _rate;
   ParkedBillItemTaxField get rate {
-    return _rate = _setField(_rate, 'rate', DbType.numeric);
+    return _rate = _setField(_rate, 'rate', DbType.real);
   }
 
   ParkedBillItemTaxField? _tax;
   ParkedBillItemTaxField get tax {
-    return _tax = _setField(_tax, 'tax', DbType.numeric);
+    return _tax = _setField(_tax, 'tax', DbType.real);
   }
 
   ParkedBillItemTaxField? _dateCreated;
@@ -6709,15 +6861,19 @@ class ParkedBillItemTaxFields {
         SqlSyntax.setField(_fTaxMethod, 'taxMethod', DbType.text);
   }
 
+  static TableField? _fType;
+  static TableField get type {
+    return _fType = _fType ?? SqlSyntax.setField(_fType, 'type', DbType.text);
+  }
+
   static TableField? _fRate;
   static TableField get rate {
-    return _fRate =
-        _fRate ?? SqlSyntax.setField(_fRate, 'rate', DbType.numeric);
+    return _fRate = _fRate ?? SqlSyntax.setField(_fRate, 'rate', DbType.real);
   }
 
   static TableField? _fTax;
   static TableField get tax {
-    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.numeric);
+    return _fTax = _fTax ?? SqlSyntax.setField(_fTax, 'tax', DbType.real);
   }
 
   static TableField? _fDateCreated;
@@ -6741,6 +6897,3154 @@ class ParkedBillItemTaxManager extends SqfEntityProvider {
 }
 
 //endregion ParkedBillItemTaxManager
+// region ProductCategoryLink
+class ProductCategoryLink extends TableBase {
+  ProductCategoryLink(
+      {this.id,
+      this.pLocalCategoryId,
+      this.pLocalProductId,
+      this.dateCreated,
+      this.isDeleted}) {
+    _setDefaultValues();
+    softDeleteActivated = true;
+  }
+  ProductCategoryLink.withFields(this.pLocalCategoryId, this.pLocalProductId,
+      this.dateCreated, this.isDeleted) {
+    _setDefaultValues();
+  }
+  ProductCategoryLink.withId(this.id, this.pLocalCategoryId,
+      this.pLocalProductId, this.dateCreated, this.isDeleted) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  ProductCategoryLink.fromMap(Map<String, dynamic> o,
+      {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    pLocalCategoryId = int.tryParse(o['pLocalCategoryId'].toString());
+
+    pLocalProductId = int.tryParse(o['pLocalProductId'].toString());
+
+    if (o['dateCreated'] != null) {
+      dateCreated = int.tryParse(o['dateCreated'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['dateCreated'].toString())!)
+          : DateTime.tryParse(o['dateCreated'].toString());
+    }
+    isDeleted = o['isDeleted'] != null
+        ? o['isDeleted'] == 1 || o['isDeleted'] == true
+        : null;
+
+    // RELATIONSHIPS FromMAP
+    plProductCategory = o['productCategory'] != null
+        ? ProductCategory.fromMap(o['productCategory'] as Map<String, dynamic>)
+        : null;
+    plProductt = o['productt'] != null
+        ? Productt.fromMap(o['productt'] as Map<String, dynamic>)
+        : null;
+    // END RELATIONSHIPS FromMAP
+  }
+  // FIELDS (ProductCategoryLink)
+  int? id;
+  int? pLocalCategoryId;
+  int? pLocalProductId;
+  DateTime? dateCreated;
+  bool? isDeleted;
+
+  // end FIELDS (ProductCategoryLink)
+
+// RELATIONSHIPS (ProductCategoryLink)
+  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plProductCategory', 'plField2'..]) or so on..
+  ProductCategory? plProductCategory;
+
+  /// get ProductCategory By PLocalCategoryId
+  Future<ProductCategory?> getProductCategory(
+      {bool loadParents = false, List<String>? loadedFields}) async {
+    final _obj = await ProductCategory().getById(pLocalCategoryId,
+        loadParents: loadParents, loadedFields: loadedFields);
+    return _obj;
+  }
+
+  /// to load parent of items to this field, use preload parameter ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plProductt', 'plField2'..]) or so on..
+  Productt? plProductt;
+
+  /// get Productt By PLocalProductId
+  Future<Productt?> getProductt(
+      {bool loadParents = false, List<String>? loadedFields}) async {
+    final _obj = await Productt().getById(pLocalProductId,
+        loadParents: loadParents, loadedFields: loadedFields);
+    return _obj;
+  }
+  // END RELATIONSHIPS (ProductCategoryLink)
+
+  static const bool _softDeleteActivated = true;
+  ProductCategoryLinkManager? __mnProductCategoryLink;
+
+  ProductCategoryLinkManager get _mnProductCategoryLink {
+    return __mnProductCategoryLink =
+        __mnProductCategoryLink ?? ProductCategoryLinkManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (pLocalCategoryId != null) {
+      map['pLocalCategoryId'] = forView
+          ? plProductCategory == null
+              ? pLocalCategoryId
+              : plProductCategory!.categoryId
+          : pLocalCategoryId;
+    } else if (pLocalCategoryId != null || !forView) {
+      map['pLocalCategoryId'] = null;
+    }
+    if (pLocalProductId != null) {
+      map['pLocalProductId'] = forView
+          ? plProductt == null
+              ? pLocalProductId
+              : plProductt!.name
+          : pLocalProductId;
+    } else if (pLocalProductId != null || !forView) {
+      map['pLocalProductId'] = null;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+    if (isDeleted != null) {
+      map['isDeleted'] = forQuery ? (isDeleted! ? 1 : 0) : isDeleted;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (pLocalCategoryId != null) {
+      map['pLocalCategoryId'] = forView
+          ? plProductCategory == null
+              ? pLocalCategoryId
+              : plProductCategory!.categoryId
+          : pLocalCategoryId;
+    } else if (pLocalCategoryId != null || !forView) {
+      map['pLocalCategoryId'] = null;
+    }
+    if (pLocalProductId != null) {
+      map['pLocalProductId'] = forView
+          ? plProductt == null
+              ? pLocalProductId
+              : plProductt!.name
+          : pLocalProductId;
+    } else if (pLocalProductId != null || !forView) {
+      map['pLocalProductId'] = null;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+    if (isDeleted != null) {
+      map['isDeleted'] = forQuery ? (isDeleted! ? 1 : 0) : isDeleted;
+    }
+
+    return map;
+  }
+
+  /// This method returns Json String [ProductCategoryLink]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [ProductCategoryLink]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [
+      pLocalCategoryId,
+      pLocalProductId,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null,
+      isDeleted
+    ];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [
+      id,
+      pLocalCategoryId,
+      pLocalProductId,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null,
+      isDeleted
+    ];
+  }
+
+  static Future<List<ProductCategoryLink>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ProductCategoryLink.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<ProductCategoryLink>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <ProductCategoryLink>[];
+    try {
+      objList = list
+          .map((productcategorylink) => ProductCategoryLink.fromMap(
+              productcategorylink as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ProductCategoryLink.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<ProductCategoryLink>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<ProductCategoryLink> objList = <ProductCategoryLink>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = ProductCategoryLink.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+      // final List<String> _loadedFields = List<String>.from(loadedFields);
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plProductCategory'))) {
+          obj.plProductCategory = obj.plProductCategory ??
+              await obj.getProductCategory(loadParents: loadParents);
+        }
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plProductt'))) {
+          obj.plProductt =
+              obj.plProductt ?? await obj.getProductt(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns ProductCategoryLink by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [ProductCategoryLink] if exist, otherwise returns null
+  Future<ProductCategoryLink?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    ProductCategoryLink? obj;
+    final data = await _mnProductCategoryLink.getById([id]);
+    if (data.length != 0) {
+      obj = ProductCategoryLink.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plProductCategory'))) {
+          obj.plProductCategory = obj.plProductCategory ??
+              await obj.getProductCategory(loadParents: loadParents);
+        }
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plProductt'))) {
+          obj.plProductt =
+              obj.plProductt ?? await obj.getProductt(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (ProductCategoryLink) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnProductCategoryLink.insert(this, ignoreBatch);
+    } else {
+      await _mnProductCategoryLink.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (ProductCategoryLink) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnProductCategoryLink.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnProductCategoryLink.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs ProductCategoryLink. Returns a new Primary Key value of ProductCategoryLink
+
+  /// <returns>Returns a new Primary Key value of ProductCategoryLink
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<ProductCategoryLink> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(
+      List<ProductCategoryLink> productcategorylinks,
+      {bool? exclusive,
+      bool? noResult,
+      bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await MyDbModel().batchStart();
+    for (final obj in productcategorylinks) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await MyDbModel().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < productcategorylinks.length; i++) {
+        if (productcategorylinks[i].id == null) {
+          productcategorylinks[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnProductCategoryLink.rawInsert(
+          'INSERT OR REPLACE INTO productCategoryLink (id, pLocalCategoryId, pLocalProductId, dateCreated,isDeleted)  VALUES (?,?,?,?,?)',
+          [
+            id,
+            pLocalCategoryId,
+            pLocalProductId,
+            dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null,
+            isDeleted
+          ],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'ProductCategoryLink id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false,
+            errorMessage: 'ProductCategoryLink id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage:
+              'ProductCategoryLink Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<ProductCategoryLink>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(
+      List<ProductCategoryLink> productcategorylinks,
+      {bool? exclusive,
+      bool? noResult,
+      bool? continueOnError}) async {
+    final results = await _mnProductCategoryLink.rawInsertAll(
+        'INSERT OR REPLACE INTO productCategoryLink (id, pLocalCategoryId, pLocalProductId, dateCreated,isDeleted)  VALUES (?,?,?,?,?)',
+        productcategorylinks,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes ProductCategoryLink
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete ProductCategoryLink invoked (id=$id)');
+    if (!_softDeleteActivated || hardDelete || isDeleted!) {
+      return _mnProductCategoryLink
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnProductCategoryLink.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  /// Recover ProductCategoryLink
+
+  /// <returns>BoolResult res.success=Recovered, not res.success=Can not recovered
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) async {
+    debugPrint('SQFENTITIY: recover ProductCategoryLink invoked (id=$id)');
+    {
+      return _mnProductCategoryLink.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 0});
+    }
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProductCategoryLinkFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProductCategoryLinkFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    dateCreated = dateCreated ?? DateTime.now();
+    isDeleted = isDeleted ?? false;
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion productcategorylink
+
+// region ProductCategoryLinkField
+class ProductCategoryLinkField extends FilterBase {
+  ProductCategoryLinkField(
+      ProductCategoryLinkFilterBuilder productcategorylinkFB)
+      : super(productcategorylinkFB);
+
+  @override
+  ProductCategoryLinkFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder isNull() {
+    return super.isNull() as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue)
+        as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as ProductCategoryLinkFilterBuilder;
+  }
+
+  @override
+  ProductCategoryLinkField get not {
+    return super.not as ProductCategoryLinkField;
+  }
+}
+// endregion ProductCategoryLinkField
+
+// region ProductCategoryLinkFilterBuilder
+class ProductCategoryLinkFilterBuilder extends ConjunctionBase {
+  ProductCategoryLinkFilterBuilder(ProductCategoryLink obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnProductCategoryLink = obj._mnProductCategoryLink;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  ProductCategoryLinkManager? _mnProductCategoryLink;
+
+  /// put the sql keyword 'AND'
+  @override
+  ProductCategoryLinkFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  ProductCategoryLinkFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  ProductCategoryLinkFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  ProductCategoryLinkFilterBuilder where(String? whereCriteria,
+      {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  ProductCategoryLinkFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  ProductCategoryLinkFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  ProductCategoryLinkFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ProductCategoryLinkFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ProductCategoryLinkFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ProductCategoryLinkFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ProductCategoryLinkFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  ProductCategoryLinkField _setField(
+      ProductCategoryLinkField? field, String colName, DbType dbtype) {
+    return ProductCategoryLinkField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  ProductCategoryLinkField? _id;
+  ProductCategoryLinkField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  ProductCategoryLinkField? _pLocalCategoryId;
+  ProductCategoryLinkField get pLocalCategoryId {
+    return _pLocalCategoryId =
+        _setField(_pLocalCategoryId, 'pLocalCategoryId', DbType.integer);
+  }
+
+  ProductCategoryLinkField? _pLocalProductId;
+  ProductCategoryLinkField get pLocalProductId {
+    return _pLocalProductId =
+        _setField(_pLocalProductId, 'pLocalProductId', DbType.integer);
+  }
+
+  ProductCategoryLinkField? _dateCreated;
+  ProductCategoryLinkField get dateCreated {
+    return _dateCreated =
+        _setField(_dateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  ProductCategoryLinkField? _isDeleted;
+  ProductCategoryLinkField get isDeleted {
+    return _isDeleted = _setField(_isDeleted, 'isDeleted', DbType.bool);
+  }
+
+  /// Deletes List<ProductCategoryLink> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnProductCategoryLink!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnProductCategoryLink!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// Recover List<ProductCategoryLink> bulk by query
+  @override
+  Future<BoolResult> recover() async {
+    buildParameters(getIsDeleted: true);
+    debugPrint('SQFENTITIY: recover ProductCategoryLink bulk invoked');
+    return _mnProductCategoryLink!.updateBatch(qparams, {'isDeleted': 0});
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from productCategoryLink ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnProductCategoryLink!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [ProductCategoryLink] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ProductCategoryLink?
+  @override
+  Future<ProductCategoryLink?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnProductCategoryLink!.toList(qparams);
+    final data = await objFuture;
+    ProductCategoryLink? obj;
+    if (data.isNotEmpty) {
+      obj = ProductCategoryLink.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD
+      if (preload || loadParents) {
+        loadedFields = loadedFields ?? [];
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plProductCategory'))) {
+          obj.plProductCategory = obj.plProductCategory ??
+              await obj.getProductCategory(loadParents: loadParents);
+        }
+        if ((preloadFields == null ||
+            loadParents ||
+            preloadFields.contains('plProductt'))) {
+          obj.plProductt =
+              obj.plProductt ?? await obj.getProductt(loadParents: loadParents);
+        }
+      } // END RELATIONSHIPS PRELOAD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [ProductCategoryLink]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ProductCategoryLink?
+  @override
+  Future<ProductCategoryLink> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        ProductCategoryLink();
+  }
+
+  /// This method returns int. [ProductCategoryLink]
+  /// <returns>int
+  @override
+  Future<int> toCount(
+      [VoidCallback Function(int c)? productcategorylinkCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final productcategorylinksFuture =
+        await _mnProductCategoryLink!.toList(qparams);
+    final int count = productcategorylinksFuture[0]['CNT'] as int;
+    if (productcategorylinkCount != null) {
+      productcategorylinkCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<ProductCategoryLink> [ProductCategoryLink]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<ProductCategoryLink>
+  @override
+  Future<List<ProductCategoryLink>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<ProductCategoryLink> productcategorylinksData =
+        await ProductCategoryLink.fromMapList(data,
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields,
+            setDefaultValues: qparams.selectColumns == null);
+    return productcategorylinksData;
+  }
+
+  /// This method returns Json String [ProductCategoryLink]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [ProductCategoryLink]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [ProductCategoryLink]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnProductCategoryLink!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [ProductCategoryLink]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] =
+        'SELECT `id` FROM productCategoryLink WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnProductCategoryLink!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [ProductCategoryLink]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnProductCategoryLink!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await ProductCategoryLink.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnProductCategoryLink!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion ProductCategoryLinkFilterBuilder
+
+// region ProductCategoryLinkFields
+class ProductCategoryLinkFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fPLocalCategoryId;
+  static TableField get pLocalCategoryId {
+    return _fPLocalCategoryId = _fPLocalCategoryId ??
+        SqlSyntax.setField(
+            _fPLocalCategoryId, 'pLocalCategoryId', DbType.integer);
+  }
+
+  static TableField? _fPLocalProductId;
+  static TableField get pLocalProductId {
+    return _fPLocalProductId = _fPLocalProductId ??
+        SqlSyntax.setField(
+            _fPLocalProductId, 'pLocalProductId', DbType.integer);
+  }
+
+  static TableField? _fDateCreated;
+  static TableField get dateCreated {
+    return _fDateCreated = _fDateCreated ??
+        SqlSyntax.setField(_fDateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  static TableField? _fIsDeleted;
+  static TableField get isDeleted {
+    return _fIsDeleted = _fIsDeleted ??
+        SqlSyntax.setField(_fIsDeleted, 'isDeleted', DbType.integer);
+  }
+}
+// endregion ProductCategoryLinkFields
+
+//region ProductCategoryLinkManager
+class ProductCategoryLinkManager extends SqfEntityProvider {
+  ProductCategoryLinkManager()
+      : super(MyDbModel(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'productCategoryLink';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion ProductCategoryLinkManager
+// region ProductCategory
+class ProductCategory extends TableBase {
+  ProductCategory(
+      {this.id, this.categoryId, this.name, this.isActive, this.dateCreated}) {
+    _setDefaultValues();
+    softDeleteActivated = false;
+  }
+  ProductCategory.withFields(
+      this.categoryId, this.name, this.isActive, this.dateCreated) {
+    _setDefaultValues();
+  }
+  ProductCategory.withId(
+      this.id, this.categoryId, this.name, this.isActive, this.dateCreated) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  ProductCategory.fromMap(Map<String, dynamic> o,
+      {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    if (o['categoryId'] != null) {
+      categoryId = o['categoryId'].toString();
+    }
+    if (o['name'] != null) {
+      name = o['name'].toString();
+    }
+    if (o['isActive'] != null) {
+      isActive =
+          o['isActive'].toString() == '1' || o['isActive'].toString() == 'true';
+    }
+    if (o['dateCreated'] != null) {
+      dateCreated = int.tryParse(o['dateCreated'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['dateCreated'].toString())!)
+          : DateTime.tryParse(o['dateCreated'].toString());
+    }
+  }
+  // FIELDS (ProductCategory)
+  int? id;
+  String? categoryId;
+  String? name;
+  bool? isActive;
+  DateTime? dateCreated;
+
+  // end FIELDS (ProductCategory)
+
+// COLLECTIONS & VIRTUALS (ProductCategory)
+  /// to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plProductCategoryLinks', 'plField2'..]) or so on..
+  List<ProductCategoryLink>? plProductCategoryLinks;
+
+  /// get ProductCategoryLink(s) filtered by id=pLocalCategoryId
+  ProductCategoryLinkFilterBuilder? getProductCategoryLinks(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    if (id == null) {
+      return null;
+    }
+    return ProductCategoryLink()
+        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
+        .pLocalCategoryId
+        .equals(id)
+        .and;
+  }
+
+  ///(RelationType.MANY_TO_MANY) (productCategoryLink) to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plProductts', 'plField2'..]) or so on..
+  List<Productt>? plProductts;
+
+  /// get Productt(s) filtered by pLocalProductId IN productCategoryLink
+  ProducttFilterBuilder? getProductts(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return Productt()
+        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
+        .where(
+            'id IN (SELECT pLocalProductId FROM productCategoryLink WHERE pLocalCategoryId=?)',
+            parameterValue: id)
+        .and;
+  }
+
+// END COLLECTIONS & VIRTUALS (ProductCategory)
+
+  static const bool _softDeleteActivated = false;
+  ProductCategoryManager? __mnProductCategory;
+
+  ProductCategoryManager get _mnProductCategory {
+    return __mnProductCategory =
+        __mnProductCategory ?? ProductCategoryManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (categoryId != null || !forView) {
+      map['categoryId'] = categoryId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (isActive != null) {
+      map['isActive'] = forQuery ? (isActive! ? 1 : 0) : isActive;
+    } else if (isActive != null || !forView) {
+      map['isActive'] = null;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (categoryId != null || !forView) {
+      map['categoryId'] = categoryId;
+    }
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (isActive != null) {
+      map['isActive'] = forQuery ? (isActive! ? 1 : 0) : isActive;
+    } else if (isActive != null || !forView) {
+      map['isActive'] = null;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+// COLLECTIONS (ProductCategory)
+    if (!forQuery) {
+      map['ProductCategoryLinks'] =
+          await getProductCategoryLinks()!.toMapList();
+    }
+    if (!forQuery) {
+      map['Productts'] = await getProductts()!.toMapList();
+    }
+// END COLLECTIONS (ProductCategory)
+
+    return map;
+  }
+
+  /// This method returns Json String [ProductCategory]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [ProductCategory]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [
+      categoryId,
+      name,
+      isActive,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [
+      id,
+      categoryId,
+      name,
+      isActive,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  static Future<List<ProductCategory>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ProductCategory.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<ProductCategory>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <ProductCategory>[];
+    try {
+      objList = list
+          .map((productcategory) =>
+              ProductCategory.fromMap(productcategory as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR ProductCategory.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<ProductCategory>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<ProductCategory> objList = <ProductCategory>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = ProductCategory.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+      // final List<String> _loadedFields = List<String>.from(loadedFields);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('productCategories.plProductCategoryLinks') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategoryLinks'))) {
+          /*_loadedfields!.add('productCategories.plProductCategoryLinks'); */ obj
+                  .plProductCategoryLinks =
+              obj.plProductCategoryLinks ??
+                  await obj.getProductCategoryLinks()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+        if (/*!_loadedfields!.contains('productCategories.plProductts') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductts'))) {
+          /*_loadedfields!.add('productCategories.plProductts'); */ obj
+                  .plProductts =
+              obj.plProductts ??
+                  await obj.getProductts()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns ProductCategory by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [ProductCategory] if exist, otherwise returns null
+  Future<ProductCategory?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    ProductCategory? obj;
+    final data = await _mnProductCategory.getById([id]);
+    if (data.length != 0) {
+      obj = ProductCategory.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('productCategories.plProductCategoryLinks') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategoryLinks'))) {
+          /*_loadedfields!.add('productCategories.plProductCategoryLinks'); */ obj
+                  .plProductCategoryLinks =
+              obj.plProductCategoryLinks ??
+                  await obj.getProductCategoryLinks()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+        if (/*!_loadedfields!.contains('productCategories.plProductts') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductts'))) {
+          /*_loadedfields!.add('productCategories.plProductts'); */ obj
+                  .plProductts =
+              obj.plProductts ??
+                  await obj.getProductts()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (ProductCategory) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnProductCategory.insert(this, ignoreBatch);
+    } else {
+      await _mnProductCategory.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (ProductCategory) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnProductCategory.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnProductCategory.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs ProductCategory. Returns a new Primary Key value of ProductCategory
+
+  /// <returns>Returns a new Primary Key value of ProductCategory
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<ProductCategory> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(List<ProductCategory> productcategories,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await MyDbModel().batchStart();
+    for (final obj in productcategories) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await MyDbModel().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < productcategories.length; i++) {
+        if (productcategories[i].id == null) {
+          productcategories[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnProductCategory.rawInsert(
+          'INSERT OR REPLACE INTO productCategories (id, categoryId, name, isActive, dateCreated)  VALUES (?,?,?,?,?)',
+          [
+            id,
+            categoryId,
+            name,
+            isActive,
+            dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+          ],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'ProductCategory id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false,
+            errorMessage: 'ProductCategory id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage: 'ProductCategory Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<ProductCategory>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(List<ProductCategory> productcategories,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    final results = await _mnProductCategory.rawInsertAll(
+        'INSERT OR REPLACE INTO productCategories (id, categoryId, name, isActive, dateCreated)  VALUES (?,?,?,?,?)',
+        productcategories,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes ProductCategory
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete ProductCategory invoked (id=$id)');
+    var result = BoolResult(success: false);
+    {
+      result = await ProductCategoryLink()
+          .select()
+          .pLocalCategoryId
+          .equals(id)
+          .and
+          .delete(hardDelete);
+    }
+    if (!result.success) {
+      return result;
+    }
+    if (!_softDeleteActivated || hardDelete) {
+      return _mnProductCategory
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnProductCategory.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) {
+    // not implemented because:
+    final msg =
+        'set useSoftDeleting:true in the table definition of [ProductCategory] to use this feature';
+    throw UnimplementedError(msg);
+  }
+
+  @override
+  ProductCategoryFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProductCategoryFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  ProductCategoryFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProductCategoryFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    isActive = isActive ?? true;
+    dateCreated = dateCreated ?? DateTime.now();
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion productcategory
+
+// region ProductCategoryField
+class ProductCategoryField extends FilterBase {
+  ProductCategoryField(ProductCategoryFilterBuilder productcategoryFB)
+      : super(productcategoryFB);
+
+  @override
+  ProductCategoryFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder isNull() {
+    return super.isNull() as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as ProductCategoryFilterBuilder;
+  }
+
+  @override
+  ProductCategoryField get not {
+    return super.not as ProductCategoryField;
+  }
+}
+// endregion ProductCategoryField
+
+// region ProductCategoryFilterBuilder
+class ProductCategoryFilterBuilder extends ConjunctionBase {
+  ProductCategoryFilterBuilder(ProductCategory obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnProductCategory = obj._mnProductCategory;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  ProductCategoryManager? _mnProductCategory;
+
+  /// put the sql keyword 'AND'
+  @override
+  ProductCategoryFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  ProductCategoryFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  ProductCategoryFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  ProductCategoryFilterBuilder where(String? whereCriteria,
+      {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  ProductCategoryFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  ProductCategoryFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  ProductCategoryFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ProductCategoryFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ProductCategoryFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ProductCategoryFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ProductCategoryFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  ProductCategoryField _setField(
+      ProductCategoryField? field, String colName, DbType dbtype) {
+    return ProductCategoryField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  ProductCategoryField? _id;
+  ProductCategoryField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  ProductCategoryField? _categoryId;
+  ProductCategoryField get categoryId {
+    return _categoryId = _setField(_categoryId, 'categoryId', DbType.text);
+  }
+
+  ProductCategoryField? _name;
+  ProductCategoryField get name {
+    return _name = _setField(_name, 'name', DbType.text);
+  }
+
+  ProductCategoryField? _isActive;
+  ProductCategoryField get isActive {
+    return _isActive = _setField(_isActive, 'isActive', DbType.bool);
+  }
+
+  ProductCategoryField? _dateCreated;
+  ProductCategoryField get dateCreated {
+    return _dateCreated =
+        _setField(_dateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  /// Deletes List<ProductCategory> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+    // Delete sub records where in (ProductCategoryLink) according to DeleteRule.CASCADE
+    final idListProductCategoryLinkBYpLocalCategoryId =
+        toListPrimaryKeySQL(false);
+    final resProductCategoryLinkBYpLocalCategoryId = await ProductCategoryLink()
+        .select()
+        .where(
+            'pLocalCategoryId IN (${idListProductCategoryLinkBYpLocalCategoryId['sql']})',
+            parameterValue: idListProductCategoryLinkBYpLocalCategoryId['args'])
+        .delete(hardDelete);
+    if (!resProductCategoryLinkBYpLocalCategoryId.success) {
+      return resProductCategoryLinkBYpLocalCategoryId;
+    }
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnProductCategory!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnProductCategory!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from productCategories ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnProductCategory!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [ProductCategory] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ProductCategory?
+  @override
+  Future<ProductCategory?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnProductCategory!.toList(qparams);
+    final data = await objFuture;
+    ProductCategory? obj;
+    if (data.isNotEmpty) {
+      obj = ProductCategory.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('productCategories.plProductCategoryLinks') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategoryLinks'))) {
+          /*_loadedfields!.add('productCategories.plProductCategoryLinks'); */ obj
+                  .plProductCategoryLinks =
+              obj.plProductCategoryLinks ??
+                  await obj.getProductCategoryLinks()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+        if (/*!_loadedfields!.contains('productCategories.plProductts') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductts'))) {
+          /*_loadedfields!.add('productCategories.plProductts'); */ obj
+                  .plProductts =
+              obj.plProductts ??
+                  await obj.getProductts()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [ProductCategory]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> ProductCategory?
+  @override
+  Future<ProductCategory> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        ProductCategory();
+  }
+
+  /// This method returns int. [ProductCategory]
+  /// <returns>int
+  @override
+  Future<int> toCount(
+      [VoidCallback Function(int c)? productcategoryCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final productcategoriesFuture = await _mnProductCategory!.toList(qparams);
+    final int count = productcategoriesFuture[0]['CNT'] as int;
+    if (productcategoryCount != null) {
+      productcategoryCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<ProductCategory> [ProductCategory]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<ProductCategory>
+  @override
+  Future<List<ProductCategory>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<ProductCategory> productcategoriesData =
+        await ProductCategory.fromMapList(data,
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields,
+            setDefaultValues: qparams.selectColumns == null);
+    return productcategoriesData;
+  }
+
+  /// This method returns Json String [ProductCategory]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [ProductCategory]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [ProductCategory]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnProductCategory!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [ProductCategory]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] =
+        'SELECT `id` FROM productCategories WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnProductCategory!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [ProductCategory]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnProductCategory!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await ProductCategory.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnProductCategory!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion ProductCategoryFilterBuilder
+
+// region ProductCategoryFields
+class ProductCategoryFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fCategoryId;
+  static TableField get categoryId {
+    return _fCategoryId = _fCategoryId ??
+        SqlSyntax.setField(_fCategoryId, 'categoryId', DbType.text);
+  }
+
+  static TableField? _fName;
+  static TableField get name {
+    return _fName = _fName ?? SqlSyntax.setField(_fName, 'name', DbType.text);
+  }
+
+  static TableField? _fIsActive;
+  static TableField get isActive {
+    return _fIsActive =
+        _fIsActive ?? SqlSyntax.setField(_fIsActive, 'isActive', DbType.bool);
+  }
+
+  static TableField? _fDateCreated;
+  static TableField get dateCreated {
+    return _fDateCreated = _fDateCreated ??
+        SqlSyntax.setField(_fDateCreated, 'dateCreated', DbType.datetime);
+  }
+}
+// endregion ProductCategoryFields
+
+//region ProductCategoryManager
+class ProductCategoryManager extends SqfEntityProvider {
+  ProductCategoryManager()
+      : super(MyDbModel(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'productCategories';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion ProductCategoryManager
+// region Productt
+class Productt extends TableBase {
+  Productt(
+      {this.id,
+      this.name,
+      this.productId,
+      this.description,
+      this.price,
+      this.isActive,
+      this.imageUrl,
+      this.dateCreated}) {
+    _setDefaultValues();
+    softDeleteActivated = false;
+  }
+  Productt.withFields(this.name, this.productId, this.description, this.price,
+      this.isActive, this.imageUrl, this.dateCreated) {
+    _setDefaultValues();
+  }
+  Productt.withId(this.id, this.name, this.productId, this.description,
+      this.price, this.isActive, this.imageUrl, this.dateCreated) {
+    _setDefaultValues();
+  }
+  // fromMap v2.0
+  Productt.fromMap(Map<String, dynamic> o, {bool setDefaultValues = true}) {
+    if (setDefaultValues) {
+      _setDefaultValues();
+    }
+    id = int.tryParse(o['id'].toString());
+    if (o['name'] != null) {
+      name = o['name'].toString();
+    }
+    if (o['productId'] != null) {
+      productId = o['productId'].toString();
+    }
+    if (o['description'] != null) {
+      description = o['description'].toString();
+    }
+    if (o['price'] != null) {
+      price = double.tryParse(o['price'].toString());
+    }
+    if (o['isActive'] != null) {
+      isActive =
+          o['isActive'].toString() == '1' || o['isActive'].toString() == 'true';
+    }
+    if (o['imageUrl'] != null) {
+      imageUrl = o['imageUrl'].toString();
+    }
+    if (o['dateCreated'] != null) {
+      dateCreated = int.tryParse(o['dateCreated'].toString()) != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              int.tryParse(o['dateCreated'].toString())!)
+          : DateTime.tryParse(o['dateCreated'].toString());
+    }
+  }
+  // FIELDS (Productt)
+  int? id;
+  String? name;
+  String? productId;
+  String? description;
+  double? price;
+  bool? isActive;
+  String? imageUrl;
+  DateTime? dateCreated;
+
+  // end FIELDS (Productt)
+
+// COLLECTIONS & VIRTUALS (Productt)
+  /// to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plProductCategoryLinks', 'plField2'..]) or so on..
+  List<ProductCategoryLink>? plProductCategoryLinks;
+
+  /// get ProductCategoryLink(s) filtered by id=pLocalProductId
+  ProductCategoryLinkFilterBuilder? getProductCategoryLinks(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    if (id == null) {
+      return null;
+    }
+    return ProductCategoryLink()
+        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
+        .pLocalProductId
+        .equals(id)
+        .and;
+  }
+
+  ///(RelationType.MANY_TO_MANY) (productCategoryLink) to load children of items to this field, use preload parameter. Ex: toList(preload:true) or toSingle(preload:true) or getById(preload:true)
+  /// You can also specify this object into certain preload fields!. Ex: toList(preload:true, preloadFields:['plProductCategories', 'plField2'..]) or so on..
+  List<ProductCategory>? plProductCategories;
+
+  /// get ProductCategory(s) filtered by pLocalCategoryId IN productCategoryLink
+  ProductCategoryFilterBuilder? getProductCategories(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProductCategory()
+        .select(columnsToSelect: columnsToSelect, getIsDeleted: getIsDeleted)
+        .where(
+            'id IN (SELECT pLocalCategoryId FROM productCategoryLink WHERE pLocalProductId=?)',
+            parameterValue: id)
+        .and;
+  }
+
+// END COLLECTIONS & VIRTUALS (Productt)
+
+  static const bool _softDeleteActivated = false;
+  ProducttManager? __mnProductt;
+
+  ProducttManager get _mnProductt {
+    return __mnProductt = __mnProductt ?? ProducttManager();
+  }
+
+  // METHODS
+  @override
+  Map<String, dynamic> toMap(
+      {bool forQuery = false, bool forJson = false, bool forView = false}) {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (productId != null || !forView) {
+      map['productId'] = productId;
+    }
+    if (description != null || !forView) {
+      map['description'] = description;
+    }
+    if (price != null || !forView) {
+      map['price'] = price;
+    }
+    if (isActive != null) {
+      map['isActive'] = forQuery ? (isActive! ? 1 : 0) : isActive;
+    } else if (isActive != null || !forView) {
+      map['isActive'] = null;
+    }
+    if (imageUrl != null || !forView) {
+      map['imageUrl'] = imageUrl;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+    return map;
+  }
+
+  @override
+  Future<Map<String, dynamic>> toMapWithChildren(
+      [bool forQuery = false,
+      bool forJson = false,
+      bool forView = false]) async {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    if (name != null || !forView) {
+      map['name'] = name;
+    }
+    if (productId != null || !forView) {
+      map['productId'] = productId;
+    }
+    if (description != null || !forView) {
+      map['description'] = description;
+    }
+    if (price != null || !forView) {
+      map['price'] = price;
+    }
+    if (isActive != null) {
+      map['isActive'] = forQuery ? (isActive! ? 1 : 0) : isActive;
+    } else if (isActive != null || !forView) {
+      map['isActive'] = null;
+    }
+    if (imageUrl != null || !forView) {
+      map['imageUrl'] = imageUrl;
+    }
+    if (dateCreated != null) {
+      map['dateCreated'] = forJson
+          ? dateCreated!.toString()
+          : forQuery
+              ? dateCreated!.millisecondsSinceEpoch
+              : dateCreated;
+    } else if (dateCreated != null || !forView) {
+      map['dateCreated'] = null;
+    }
+
+// COLLECTIONS (Productt)
+    if (!forQuery) {
+      map['ProductCategoryLinks'] =
+          await getProductCategoryLinks()!.toMapList();
+    }
+    if (!forQuery) {
+      map['ProductCategories'] = await getProductCategories()!.toMapList();
+    }
+// END COLLECTIONS (Productt)
+
+    return map;
+  }
+
+  /// This method returns Json String [Productt]
+  @override
+  String toJson() {
+    return json.encode(toMap(forJson: true));
+  }
+
+  /// This method returns Json String [Productt]
+  @override
+  Future<String> toJsonWithChilds() async {
+    return json.encode(await toMapWithChildren(false, true));
+  }
+
+  @override
+  List<dynamic> toArgs() {
+    return [
+      name,
+      productId,
+      description,
+      price,
+      isActive,
+      imageUrl,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  @override
+  List<dynamic> toArgsWithIds() {
+    return [
+      id,
+      name,
+      productId,
+      description,
+      price,
+      isActive,
+      imageUrl,
+      dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+    ];
+  }
+
+  static Future<List<Productt>?> fromWebUrl(Uri uri,
+      {Map<String, String>? headers}) async {
+    try {
+      final response = await http.get(uri, headers: headers);
+      return await fromJson(response.body);
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR Productt.fromWebUrl: ErrorMessage: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<http.Response> postUrl(Uri uri, {Map<String, String>? headers}) {
+    return http.post(uri, headers: headers, body: toJson());
+  }
+
+  static Future<List<Productt>> fromJson(String jsonBody) async {
+    final Iterable list = await json.decode(jsonBody) as Iterable;
+    var objList = <Productt>[];
+    try {
+      objList = list
+          .map((productt) => Productt.fromMap(productt as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(
+          'SQFENTITY ERROR Productt.fromJson: ErrorMessage: ${e.toString()}');
+    }
+    return objList;
+  }
+
+  static Future<List<Productt>> fromMapList(List<dynamic> data,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields,
+      bool setDefaultValues = true}) async {
+    final List<Productt> objList = <Productt>[];
+    loadedFields = loadedFields ?? [];
+    for (final map in data) {
+      final obj = Productt.fromMap(map as Map<String, dynamic>,
+          setDefaultValues: setDefaultValues);
+      // final List<String> _loadedFields = List<String>.from(loadedFields);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('productt.plProductCategoryLinks') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategoryLinks'))) {
+          /*_loadedfields!.add('productt.plProductCategoryLinks'); */ obj
+                  .plProductCategoryLinks =
+              obj.plProductCategoryLinks ??
+                  await obj.getProductCategoryLinks()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+        if (/*!_loadedfields!.contains('productt.plProductCategories') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategories'))) {
+          /*_loadedfields!.add('productt.plProductCategories'); */ obj
+                  .plProductCategories =
+              obj.plProductCategories ??
+                  await obj.getProductCategories()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+
+      objList.add(obj);
+    }
+    return objList;
+  }
+
+  /// returns Productt by ID if exist, otherwise returns null
+  /// Primary Keys: int? id
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: getById(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: getById(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>returns [Productt] if exist, otherwise returns null
+  Future<Productt?> getById(int? id,
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    if (id == null) {
+      return null;
+    }
+    Productt? obj;
+    final data = await _mnProductt.getById([id]);
+    if (data.length != 0) {
+      obj = Productt.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('productt.plProductCategoryLinks') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategoryLinks'))) {
+          /*_loadedfields!.add('productt.plProductCategoryLinks'); */ obj
+                  .plProductCategoryLinks =
+              obj.plProductCategoryLinks ??
+                  await obj.getProductCategoryLinks()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+        if (/*!_loadedfields!.contains('productt.plProductCategories') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategories'))) {
+          /*_loadedfields!.add('productt.plProductCategories'); */ obj
+                  .plProductCategories =
+              obj.plProductCategories ??
+                  await obj.getProductCategories()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// Saves the (Productt) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> save({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnProductt.insert(this, ignoreBatch);
+    } else {
+      await _mnProductt.update(this);
+    }
+
+    return id;
+  }
+
+  /// Saves the (Productt) object. If the id field is null, saves as a new record and returns new id, if id is not null then updates record
+  /// ignoreBatch = true as a default. Set ignoreBatch to false if you run more than one save() operation those are between batchStart and batchCommit
+  /// <returns>Returns id
+  @override
+  Future<int?> saveOrThrow({bool ignoreBatch = true}) async {
+    if (id == null || id == 0) {
+      id = await _mnProductt.insertOrThrow(this, ignoreBatch);
+
+      isInsert = true;
+    } else {
+      // id= await _upsert(); // removed in sqfentity_gen 1.3.0+6
+      await _mnProductt.updateOrThrow(this);
+    }
+
+    return id;
+  }
+
+  /// saveAs Productt. Returns a new Primary Key value of Productt
+
+  /// <returns>Returns a new Primary Key value of Productt
+  @override
+  Future<int?> saveAs({bool ignoreBatch = true}) async {
+    id = null;
+
+    return save(ignoreBatch: ignoreBatch);
+  }
+
+  /// saveAll method saves the sent List<Productt> as a bulk in one transaction
+  /// Returns a <List<BoolResult>>
+  static Future<List<dynamic>> saveAll(List<Productt> productts,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    List<dynamic>? result = [];
+    // If there is no open transaction, start one
+    final isStartedBatch = await MyDbModel().batchStart();
+    for (final obj in productts) {
+      await obj.save(ignoreBatch: false);
+    }
+    if (!isStartedBatch) {
+      result = await MyDbModel().batchCommit(
+          exclusive: exclusive,
+          noResult: noResult,
+          continueOnError: continueOnError);
+      for (int i = 0; i < productts.length; i++) {
+        if (productts[i].id == null) {
+          productts[i].id = result![i] as int;
+        }
+      }
+    }
+    return result!;
+  }
+
+  /// Updates if the record exists, otherwise adds a new row
+  /// <returns>Returns id
+  @override
+  Future<int?> upsert({bool ignoreBatch = true}) async {
+    try {
+      final result = await _mnProductt.rawInsert(
+          'INSERT OR REPLACE INTO productt (id, name, productId, description, price, isActive, imageUrl, dateCreated)  VALUES (?,?,?,?,?,?,?,?)',
+          [
+            id,
+            name,
+            productId,
+            description,
+            price,
+            isActive,
+            imageUrl,
+            dateCreated != null ? dateCreated!.millisecondsSinceEpoch : null
+          ],
+          ignoreBatch);
+      if (result! > 0) {
+        saveResult = BoolResult(
+            success: true,
+            successMessage: 'Productt id=$id updated successfully');
+      } else {
+        saveResult = BoolResult(
+            success: false, errorMessage: 'Productt id=$id did not update');
+      }
+      return id;
+    } catch (e) {
+      saveResult = BoolResult(
+          success: false,
+          errorMessage: 'Productt Save failed. Error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// inserts or replaces the sent List<<Productt>> as a bulk in one transaction.
+  /// upsertAll() method is faster then saveAll() method. upsertAll() should be used when you are sure that the primary key is greater than zero
+  /// Returns a BoolCommitResult
+  @override
+  Future<BoolCommitResult> upsertAll(List<Productt> productts,
+      {bool? exclusive, bool? noResult, bool? continueOnError}) async {
+    final results = await _mnProductt.rawInsertAll(
+        'INSERT OR REPLACE INTO productt (id, name, productId, description, price, isActive, imageUrl, dateCreated)  VALUES (?,?,?,?,?,?,?,?)',
+        productts,
+        exclusive: exclusive,
+        noResult: noResult,
+        continueOnError: continueOnError);
+    return results;
+  }
+
+  /// Deletes Productt
+
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    debugPrint('SQFENTITIY: delete Productt invoked (id=$id)');
+    var result = BoolResult(success: false);
+    {
+      result = await ProductCategoryLink()
+          .select()
+          .pLocalProductId
+          .equals(id)
+          .and
+          .delete(hardDelete);
+    }
+    if (!result.success) {
+      return result;
+    }
+    if (!_softDeleteActivated || hardDelete) {
+      return _mnProductt
+          .delete(QueryParams(whereString: 'id=?', whereArguments: [id]));
+    } else {
+      return _mnProductt.updateBatch(
+          QueryParams(whereString: 'id=?', whereArguments: [id]),
+          {'isDeleted': 1});
+    }
+  }
+
+  @override
+  Future<BoolResult> recover([bool recoverChilds = true]) {
+    // not implemented because:
+    final msg =
+        'set useSoftDeleting:true in the table definition of [Productt] to use this feature';
+    throw UnimplementedError(msg);
+  }
+
+  @override
+  ProducttFilterBuilder select(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProducttFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect;
+  }
+
+  @override
+  ProducttFilterBuilder distinct(
+      {List<String>? columnsToSelect, bool? getIsDeleted}) {
+    return ProducttFilterBuilder(this, getIsDeleted)
+      ..qparams.selectColumns = columnsToSelect
+      ..qparams.distinct = true;
+  }
+
+  void _setDefaultValues() {
+    price = price ?? 0;
+    isActive = isActive ?? true;
+    dateCreated = dateCreated ?? DateTime.now();
+  }
+
+  @override
+  void rollbackPk() {
+    if (isInsert == true) {
+      id = null;
+    }
+  }
+
+  // END METHODS
+  // BEGIN CUSTOM CODE
+  /*
+      you can define customCode property of your SqfEntityTable constant. For example:
+      const tablePerson = SqfEntityTable(
+      tableName: 'person',
+      primaryKeyName: 'id',
+      primaryKeyType: PrimaryKeyType.integer_auto_incremental,
+      fields: [
+        SqfEntityField('firstName', DbType.text),
+        SqfEntityField('lastName', DbType.text),
+      ],
+      customCode: '''
+       String fullName()
+       { 
+         return '$firstName $lastName';
+       }
+      ''');
+     */
+  // END CUSTOM CODE
+}
+// endregion productt
+
+// region ProducttField
+class ProducttField extends FilterBase {
+  ProducttField(ProducttFilterBuilder producttFB) : super(producttFB);
+
+  @override
+  ProducttFilterBuilder equals(dynamic pValue) {
+    return super.equals(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder equalsOrNull(dynamic pValue) {
+    return super.equalsOrNull(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder isNull() {
+    return super.isNull() as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder contains(dynamic pValue) {
+    return super.contains(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder startsWith(dynamic pValue) {
+    return super.startsWith(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder endsWith(dynamic pValue) {
+    return super.endsWith(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder between(dynamic pFirst, dynamic pLast) {
+    return super.between(pFirst, pLast) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder greaterThan(dynamic pValue) {
+    return super.greaterThan(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder lessThan(dynamic pValue) {
+    return super.lessThan(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder greaterThanOrEquals(dynamic pValue) {
+    return super.greaterThanOrEquals(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder lessThanOrEquals(dynamic pValue) {
+    return super.lessThanOrEquals(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttFilterBuilder inValues(dynamic pValue) {
+    return super.inValues(pValue) as ProducttFilterBuilder;
+  }
+
+  @override
+  ProducttField get not {
+    return super.not as ProducttField;
+  }
+}
+// endregion ProducttField
+
+// region ProducttFilterBuilder
+class ProducttFilterBuilder extends ConjunctionBase {
+  ProducttFilterBuilder(Productt obj, bool? getIsDeleted)
+      : super(obj, getIsDeleted) {
+    _mnProductt = obj._mnProductt;
+    _softDeleteActivated = obj.softDeleteActivated;
+  }
+
+  bool _softDeleteActivated = false;
+  ProducttManager? _mnProductt;
+
+  /// put the sql keyword 'AND'
+  @override
+  ProducttFilterBuilder get and {
+    super.and;
+    return this;
+  }
+
+  /// put the sql keyword 'OR'
+  @override
+  ProducttFilterBuilder get or {
+    super.or;
+    return this;
+  }
+
+  /// open parentheses
+  @override
+  ProducttFilterBuilder get startBlock {
+    super.startBlock;
+    return this;
+  }
+
+  /// String whereCriteria, write raw query without 'where' keyword. Like this: 'field1 like 'test%' and field2 = 3'
+  @override
+  ProducttFilterBuilder where(String? whereCriteria, {dynamic parameterValue}) {
+    super.where(whereCriteria, parameterValue: parameterValue);
+    return this;
+  }
+
+  /// page = page number,
+  /// pagesize = row(s) per page
+  @override
+  ProducttFilterBuilder page(int page, int pagesize) {
+    super.page(page, pagesize);
+    return this;
+  }
+
+  /// int count = LIMIT
+  @override
+  ProducttFilterBuilder top(int count) {
+    super.top(count);
+    return this;
+  }
+
+  /// close parentheses
+  @override
+  ProducttFilterBuilder get endBlock {
+    super.endBlock;
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ProducttFilterBuilder orderBy(dynamic argFields) {
+    super.orderBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ProducttFilterBuilder orderByDesc(dynamic argFields) {
+    super.orderByDesc(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='field1, field2'
+  /// Example 2: argFields = ['field1', 'field2']
+  @override
+  ProducttFilterBuilder groupBy(dynamic argFields) {
+    super.groupBy(argFields);
+    return this;
+  }
+
+  /// argFields might be String or List<String>.
+  /// Example 1: argFields='name, date'
+  /// Example 2: argFields = ['name', 'date']
+  @override
+  ProducttFilterBuilder having(dynamic argFields) {
+    super.having(argFields);
+    return this;
+  }
+
+  ProducttField _setField(ProducttField? field, String colName, DbType dbtype) {
+    return ProducttField(this)
+      ..param = DbParameter(
+          dbType: dbtype, columnName: colName, wStartBlock: openedBlock);
+  }
+
+  ProducttField? _id;
+  ProducttField get id {
+    return _id = _setField(_id, 'id', DbType.integer);
+  }
+
+  ProducttField? _name;
+  ProducttField get name {
+    return _name = _setField(_name, 'name', DbType.text);
+  }
+
+  ProducttField? _productId;
+  ProducttField get productId {
+    return _productId = _setField(_productId, 'productId', DbType.text);
+  }
+
+  ProducttField? _description;
+  ProducttField get description {
+    return _description = _setField(_description, 'description', DbType.text);
+  }
+
+  ProducttField? _price;
+  ProducttField get price {
+    return _price = _setField(_price, 'price', DbType.real);
+  }
+
+  ProducttField? _isActive;
+  ProducttField get isActive {
+    return _isActive = _setField(_isActive, 'isActive', DbType.bool);
+  }
+
+  ProducttField? _imageUrl;
+  ProducttField get imageUrl {
+    return _imageUrl = _setField(_imageUrl, 'imageUrl', DbType.text);
+  }
+
+  ProducttField? _dateCreated;
+  ProducttField get dateCreated {
+    return _dateCreated =
+        _setField(_dateCreated, 'dateCreated', DbType.datetime);
+  }
+
+  /// Deletes List<Productt> bulk by query
+  ///
+  /// <returns>BoolResult res.success= true (Deleted), false (Could not be deleted)
+  @override
+  Future<BoolResult> delete([bool hardDelete = false]) async {
+    buildParameters();
+    var r = BoolResult(success: false);
+    // Delete sub records where in (ProductCategoryLink) according to DeleteRule.CASCADE
+    final idListProductCategoryLinkBYpLocalProductId =
+        toListPrimaryKeySQL(false);
+    final resProductCategoryLinkBYpLocalProductId = await ProductCategoryLink()
+        .select()
+        .where(
+            'pLocalProductId IN (${idListProductCategoryLinkBYpLocalProductId['sql']})',
+            parameterValue: idListProductCategoryLinkBYpLocalProductId['args'])
+        .delete(hardDelete);
+    if (!resProductCategoryLinkBYpLocalProductId.success) {
+      return resProductCategoryLinkBYpLocalProductId;
+    }
+
+    if (_softDeleteActivated && !hardDelete) {
+      r = await _mnProductt!.updateBatch(qparams, {'isDeleted': 1});
+    } else {
+      r = await _mnProductt!.delete(qparams);
+    }
+    return r;
+  }
+
+  /// using:
+  /// update({'fieldName': Value})
+  /// fieldName must be String. Value is dynamic, it can be any of the (int, bool, String.. )
+  @override
+  Future<BoolResult> update(Map<String, dynamic> values) {
+    buildParameters();
+    if (qparams.limit! > 0 || qparams.offset! > 0) {
+      qparams.whereString =
+          'id IN (SELECT id from productt ${qparams.whereString!.isNotEmpty ? 'WHERE ${qparams.whereString}' : ''}${qparams.limit! > 0 ? ' LIMIT ${qparams.limit}' : ''}${qparams.offset! > 0 ? ' OFFSET ${qparams.offset}' : ''})';
+    }
+    return _mnProductt!.updateBatch(qparams, values);
+  }
+
+  /// This method always returns [Productt] Obj if exist, otherwise returns null
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> Productt?
+  @override
+  Future<Productt?> toSingle(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    buildParameters(pSize: 1);
+    final objFuture = _mnProductt!.toList(qparams);
+    final data = await objFuture;
+    Productt? obj;
+    if (data.isNotEmpty) {
+      obj = Productt.fromMap(data[0] as Map<String, dynamic>);
+
+      // RELATIONSHIPS PRELOAD CHILD
+      if (preload) {
+        loadedFields = loadedFields ?? [];
+        if (/*!_loadedfields!.contains('productt.plProductCategoryLinks') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategoryLinks'))) {
+          /*_loadedfields!.add('productt.plProductCategoryLinks'); */ obj
+                  .plProductCategoryLinks =
+              obj.plProductCategoryLinks ??
+                  await obj.getProductCategoryLinks()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+        if (/*!_loadedfields!.contains('productt.plProductCategories') && */ (preloadFields ==
+                null ||
+            preloadFields.contains('plProductCategories'))) {
+          /*_loadedfields!.add('productt.plProductCategories'); */ obj
+                  .plProductCategories =
+              obj.plProductCategories ??
+                  await obj.getProductCategories()!.toList(
+                      preload: preload,
+                      preloadFields: preloadFields,
+                      loadParents: false /*, loadedFields:_loadedFields*/);
+        }
+      } // END RELATIONSHIPS PRELOAD CHILD
+    } else {
+      obj = null;
+    }
+    return obj;
+  }
+
+  /// This method always returns [Productt]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toSingle(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toSingle(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns> Productt?
+  @override
+  Future<Productt> toSingleOrDefault(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    return await toSingle(
+            preload: preload,
+            preloadFields: preloadFields,
+            loadParents: loadParents,
+            loadedFields: loadedFields) ??
+        Productt();
+  }
+
+  /// This method returns int. [Productt]
+  /// <returns>int
+  @override
+  Future<int> toCount([VoidCallback Function(int c)? producttCount]) async {
+    buildParameters();
+    qparams.selectColumns = ['COUNT(1) AS CNT'];
+    final producttsFuture = await _mnProductt!.toList(qparams);
+    final int count = producttsFuture[0]['CNT'] as int;
+    if (producttCount != null) {
+      producttCount(count);
+    }
+    return count;
+  }
+
+  /// This method returns List<Productt> [Productt]
+  /// bool preload: if true, loads all related child objects (Set preload to true if you want to load all fields related to child or parent)
+  /// ex: toList(preload:true) -> Loads all related objects
+  /// List<String> preloadFields: specify the fields you want to preload (preload parameter's value should also be "true")
+  /// ex: toList(preload:true, preloadFields:['plField1','plField2'... etc])  -> Loads only certain fields what you specified
+  /// bool loadParents: if true, loads all parent objects until the object has no parent
+
+  /// <returns>List<Productt>
+  @override
+  Future<List<Productt>> toList(
+      {bool preload = false,
+      List<String>? preloadFields,
+      bool loadParents = false,
+      List<String>? loadedFields}) async {
+    final data = await toMapList();
+    final List<Productt> producttsData = await Productt.fromMapList(data,
+        preload: preload,
+        preloadFields: preloadFields,
+        loadParents: loadParents,
+        loadedFields: loadedFields,
+        setDefaultValues: qparams.selectColumns == null);
+    return producttsData;
+  }
+
+  /// This method returns Json String [Productt]
+  @override
+  Future<String> toJson() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(o.toMap(forJson: true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns Json String. [Productt]
+  @override
+  Future<String> toJsonWithChilds() async {
+    final list = <dynamic>[];
+    final data = await toList();
+    for (var o in data) {
+      list.add(await o.toMapWithChildren(false, true));
+    }
+    return json.encode(list);
+  }
+
+  /// This method returns List<dynamic>. [Productt]
+  /// <returns>List<dynamic>
+  @override
+  Future<List<dynamic>> toMapList() async {
+    buildParameters();
+    return await _mnProductt!.toList(qparams);
+  }
+
+  /// This method returns Primary Key List SQL and Parameters retVal = Map<String,dynamic>. [Productt]
+  /// retVal['sql'] = SQL statement string, retVal['args'] = whereArguments List<dynamic>;
+  /// <returns>List<String>
+  @override
+  Map<String, dynamic> toListPrimaryKeySQL([bool buildParams = true]) {
+    final Map<String, dynamic> _retVal = <String, dynamic>{};
+    if (buildParams) {
+      buildParameters();
+    }
+    _retVal['sql'] = 'SELECT `id` FROM productt WHERE ${qparams.whereString}';
+    _retVal['args'] = qparams.whereArguments;
+    return _retVal;
+  }
+
+  /// This method returns Primary Key List<int>.
+  /// <returns>List<int>
+  @override
+  Future<List<int>> toListPrimaryKey([bool buildParams = true]) async {
+    if (buildParams) {
+      buildParameters();
+    }
+    final List<int> idData = <int>[];
+    qparams.selectColumns = ['id'];
+    final idFuture = await _mnProductt!.toList(qparams);
+
+    final int count = idFuture.length;
+    for (int i = 0; i < count; i++) {
+      idData.add(idFuture[i]['id'] as int);
+    }
+    return idData;
+  }
+
+  /// Returns List<dynamic> for selected columns. Use this method for 'groupBy' with min,max,avg..  [Productt]
+  /// Sample usage: (see EXAMPLE 4.2 at https://github.com/hhtokpinar/sqfEntity#group-by)
+  @override
+  Future<List<dynamic>> toListObject() async {
+    buildParameters();
+
+    final objectFuture = _mnProductt!.toList(qparams);
+
+    final List<dynamic> objectsData = <dynamic>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i]);
+    }
+    return objectsData;
+  }
+
+  /// Returns List<String> for selected first column
+  /// Sample usage: await Productt.select(columnsToSelect: ['columnName']).toListString()
+  @override
+  Future<List<String>> toListString(
+      [VoidCallback Function(List<String> o)? listString]) async {
+    buildParameters();
+
+    final objectFuture = _mnProductt!.toList(qparams);
+
+    final List<String> objectsData = <String>[];
+    final data = await objectFuture;
+    final int count = data.length;
+    for (int i = 0; i < count; i++) {
+      objectsData.add(data[i][qparams.selectColumns![0]].toString());
+    }
+    if (listString != null) {
+      listString(objectsData);
+    }
+    return objectsData;
+  }
+}
+// endregion ProducttFilterBuilder
+
+// region ProducttFields
+class ProducttFields {
+  static TableField? _fId;
+  static TableField get id {
+    return _fId = _fId ?? SqlSyntax.setField(_fId, 'id', DbType.integer);
+  }
+
+  static TableField? _fName;
+  static TableField get name {
+    return _fName = _fName ?? SqlSyntax.setField(_fName, 'name', DbType.text);
+  }
+
+  static TableField? _fProductId;
+  static TableField get productId {
+    return _fProductId = _fProductId ??
+        SqlSyntax.setField(_fProductId, 'productId', DbType.text);
+  }
+
+  static TableField? _fDescription;
+  static TableField get description {
+    return _fDescription = _fDescription ??
+        SqlSyntax.setField(_fDescription, 'description', DbType.text);
+  }
+
+  static TableField? _fPrice;
+  static TableField get price {
+    return _fPrice =
+        _fPrice ?? SqlSyntax.setField(_fPrice, 'price', DbType.real);
+  }
+
+  static TableField? _fIsActive;
+  static TableField get isActive {
+    return _fIsActive =
+        _fIsActive ?? SqlSyntax.setField(_fIsActive, 'isActive', DbType.bool);
+  }
+
+  static TableField? _fImageUrl;
+  static TableField get imageUrl {
+    return _fImageUrl =
+        _fImageUrl ?? SqlSyntax.setField(_fImageUrl, 'imageUrl', DbType.text);
+  }
+
+  static TableField? _fDateCreated;
+  static TableField get dateCreated {
+    return _fDateCreated = _fDateCreated ??
+        SqlSyntax.setField(_fDateCreated, 'dateCreated', DbType.datetime);
+  }
+}
+// endregion ProducttFields
+
+//region ProducttManager
+class ProducttManager extends SqfEntityProvider {
+  ProducttManager()
+      : super(MyDbModel(),
+            tableName: _tableName,
+            primaryKeyList: _primaryKeyList,
+            whereStr: _whereStr);
+  static const String _tableName = 'productt';
+  static const List<String> _primaryKeyList = ['id'];
+  static const String _whereStr = 'id=?';
+}
+
+//endregion ProducttManager
 /// Region SEQUENCE IdentitySequence
 class IdentitySequence {
   /// Assigns a new value when it is triggered and returns the new value

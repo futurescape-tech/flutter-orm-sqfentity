@@ -344,12 +344,11 @@ class TablePlaylistTrack extends SqfEntityTableBase {
     // declare fields
     fields = [
       SqfEntityFieldRelationshipBase(
-          TablePlaylist.getInstance, DeleteRule.NO_ACTION,
+          TablePlaylist.getInstance, DeleteRule.CASCADE,
           relationType: RelationType.ONE_TO_MANY,
           fieldName: 'PlaylistId',
           isPrimaryKeyField: true),
-      SqfEntityFieldRelationshipBase(
-          TableTrack.getInstance, DeleteRule.NO_ACTION,
+      SqfEntityFieldRelationshipBase(TableTrack.getInstance, DeleteRule.CASCADE,
           relationType: RelationType.ONE_TO_MANY,
           fieldName: 'TrackId',
           isPrimaryKeyField: true),
@@ -13348,7 +13347,7 @@ class MediaTypeController extends MediaType {
 
 // BEGIN CONTROLLER (Playlist)
 class PlaylistToTrackControllerSub extends TrackController {
-  static String relationshipFieldName = 'mPlaylistTrack';
+  static String relationshipFieldName = 'PlaylistPlaylistId';
   static String primaryKeyName = 'TrackId';
   static bool useSoftDeleting = false;
   //static String formListTitleField = 'Name';
@@ -13365,7 +13364,7 @@ class PlaylistController extends Playlist {
   );
   Map<String, String> subMenu() {
     final menu = <String, String>{};
-    menu['PlaylistToTrack'] = 'Playlist To Track(mPlaylistTrack)';
+    menu['PlaylistToTrack'] = 'Playlist To Track(PlaylistPlaylistId)';
 
     return menu;
   }

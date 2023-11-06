@@ -357,6 +357,7 @@ class SqfEntityProvider extends SqfEntityModelBase {
     if (openedBatch[_dbModel!.databaseName] == null || ignoreBatch) {
       final Database? db = await this.db;
       final result = await db?.insert(_tableName!, data);
+      db.transaction((txn) => null)
       obj.saveResult = BoolResult(
           success: true,
           successMessage:

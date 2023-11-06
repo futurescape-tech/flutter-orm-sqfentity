@@ -173,8 +173,7 @@ const tableTrack = SqfEntityTable(
           isPrimaryKeyField: false),
       SqfEntityFieldRelationship(
           parentTable: tablePlaylist,
-          deleteRule: DeleteRule.NO_ACTION,
-          fieldName: 'mPlaylistTrack',
+          deleteRule: DeleteRule.CASCADE,
           relationType: RelationType.MANY_TO_MANY,
           manyToManyTableName: 'PlaylistTrack'),
     ]);
